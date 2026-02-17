@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Journal;
+use App\Models\Volume;
+use App\Models\Issue;
 use App\Models\User;
 use App\Models\Tag;
 use Illuminate\Http\Request;
@@ -51,19 +53,6 @@ class AdminJournalsController extends Controller
     }
 
     /**
-     * Display pending journals (submitted)
-     */
-    public function pending()
-    {
-        $journals = Journal::with(['author', 'tags'])
-            ->where('status', 'submitted')
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
-
-        return view('admin.journals.pending', compact('journals'));
-    }
-
-    /**
      * Display the specified journal
      */
     public function show($id)
@@ -79,14 +68,18 @@ class AdminJournalsController extends Controller
      */
     public function edit($id)
     {
-        $journal = Journal::with(['author', 'coAuthors', 'tags', 'files'])->findOrFail($id);
+        $journal = Journal::with(['author', 'coAuthors', 'tags', 'files', 'volume', 'issue'])->findOrFail($id);
         $tags = Tag::orderBy('name')->get();
         $authors = User::where('role', 'author')->orderBy('name')->get();
+
+        // Get volumes and issues for dropdown
+        $volumes = Volume::where('status', 'published')->orderBy('year', 'desc')->get();
+        $issues = Issue::where('status', 'published')->orderBy('publication_date', 'desc')->get();
 
         // Get selected tag IDs for the view
         $selectedTags = $journal->tags->pluck('id')->toArray();
 
-        return view('admin.journals.edit', compact('journal', 'tags', 'authors', 'selectedTags'));
+        return view('admin.journals.edit', compact('journal', 'tags', 'authors', 'selectedTags', 'volumes', 'issues'));
     }
 
     /**
@@ -103,6 +96,13 @@ class AdminJournalsController extends Controller
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',
             'admin_notes' => 'nullable|string',
+
+            // Add volume and issue validation
+            'volume_id' => 'nullable|exists:volumes,id',
+            'issue_id' => 'nullable|exists:issues,id',
+            'page_start' => 'nullable|integer|min:1',
+            'page_end' => 'nullable|integer|min:1|gt:page_start',
+            'doi' => 'nullable|string|unique:journals,doi,' . $id,
 
             // Co-authors validation
             'co_authors' => 'nullable|array',
@@ -126,13 +126,18 @@ class AdminJournalsController extends Controller
         $journal = Journal::findOrFail($id);
         $oldStatus = $journal->status;
 
-        // Update journal basic info
+        // Update journal basic info with volume/issue
         $journal->update([
             'title' => $request->title,
             'abstract' => $request->abstract,
             'content' => $request->journal_content,
             'user_id' => $request->author_id,
             'status' => $request->status,
+            'volume_id' => $request->volume_id,
+            'issue_id' => $request->issue_id,
+            'page_start' => $request->page_start,
+            'page_end' => $request->page_end,
+            'doi' => $request->doi,
         ]);
 
         // Update tags

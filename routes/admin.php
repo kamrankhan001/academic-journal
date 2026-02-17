@@ -5,6 +5,10 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminJournalsController;
 use App\Http\Controllers\Admin\AdminUsersController;
 use App\Http\Controllers\Admin\AdminTagsController;
+use App\Http\Controllers\Admin\VolumeController;
+use App\Http\Controllers\Admin\IssueController;
+use App\Http\Controllers\Admin\ReviewerController;
+use App\Http\Controllers\Admin\ReviewAssignmentController;
 use App\Http\Controllers\Author\ProfileController;
 use App\Http\Controllers\Admin\AdminAnnouncementController;
 use App\Http\Controllers\Admin\NotificationController as AdminNotificationController;
@@ -25,7 +29,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     // Journals Management
     Route::prefix('journals')->name('journals.')->controller(AdminJournalsController::class)->group(function () {
         Route::get('/', 'index')->name('index');
-        Route::get('/pending', 'pending')->name('pending');
         Route::get('/{id}', 'show')->name('show');
         Route::get('/{id}/edit', 'edit')->name('edit');
         Route::put('/{id}', 'update')->name('update');
@@ -63,6 +66,28 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::post('/merge', 'merge')->name('merge');
     });
     
+    Route::resource('volumes', VolumeController::class);
+    Route::post('volumes/{volume}/publish', [VolumeController::class, 'publish'])->name('volumes.publish');
+    
+    // Issue Management
+    Route::resource('issues', IssueController::class);
+    Route::get('volumes/{volume}/issues/create', [IssueController::class, 'createForVolume'])->name('issues.create-for-volume');
+    Route::post('issues/{issue}/publish', [IssueController::class, 'publish'])->name('issues.publish');
+    
+    // Reviewer Management
+    Route::resource('reviewers', ReviewerController::class);
+    Route::post('reviewers/{reviewer}/toggle-status', [ReviewerController::class, 'toggleStatus'])->name('reviewers.toggle-status');
+    
+    // Review Assignments
+    Route::controller(ReviewAssignmentController::class)->group(function () {
+        Route::get('journals/{journal}/assign-reviewers', 'create')->name('assign-reviewers.create');
+        Route::post('journals/{journal}/assign-reviewers', 'store')->name('assign-reviewers.store');
+        Route::get('assignments', 'index')->name('assignments.index');
+        Route::get('assignments/{assignment}', 'show')->name('assignments.show');
+        Route::post('assignments/{assignment}/remind', 'sendReminder')->name('assignments.remind');
+        Route::delete('assignments/{assignment}', 'destroy')->name('assignments.destroy');
+    });
+
     // Announcements Management
     Route::prefix('announcements')->name('announcements.')->controller(AdminAnnouncementController::class)->group(function () {
         Route::get('/', 'index')->name('index');

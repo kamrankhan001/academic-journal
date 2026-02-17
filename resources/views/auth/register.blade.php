@@ -17,8 +17,33 @@
                 <form method="POST" action="{{ route('register') }}" class="space-y-6">
                     @csrf
 
-                    <!-- Hidden Account Type -->
-                    <input type="hidden" name="role" value="author">
+                    <!-- Role Selection -->
+                    <div>
+                        <label for="role" class="block text-sm font-medium text-gray-700 mb-2">
+                            Register as <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fa-regular fa-id-badge text-gray-400"></i>
+                            </div>
+                            <select 
+                                id="role" 
+                                name="role"
+                                class="block w-full pl-10 pr-10 py-3 border {{ $errors->has('role') ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-[#86662c]' }} rounded-lg focus:ring-2 focus:border-transparent outline-none transition-colors appearance-none bg-white"
+                                required
+                            >
+                                <option value="author" {{ old('role') == 'author' ? 'selected' : '' }}>Author</option>
+                                <option value="reviewer" {{ old('role') == 'reviewer' ? 'selected' : '' }}>Reviewer</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <i class="fa-solid fa-chevron-down text-gray-400"></i>
+                            </div>
+                        </div>
+                        @error('role')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                        <p class="text-xs text-gray-500 mt-1">Choose how you want to participate in the journal</p>
+                    </div>
 
                     <!-- Full Name -->
                     <div>
@@ -151,6 +176,20 @@
                         </div>
                     </div>
 
+                    <!-- Role-specific info message -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div class="flex">
+                            <div class="shrink-0">
+                                <i class="fa-solid fa-circle-info text-blue-400"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-blue-700" id="roleInfo">
+                                    As an <strong>Author</strong>, you'll be able to submit manuscripts and track their review status.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Submit Button -->
                     <button type="submit" 
                             class="w-full bg-[#86662c] text-white py-3 px-4 rounded-lg text-sm font-medium hover:bg-[#6b4f23] transition-colors duration-200 shadow-sm flex items-center justify-center space-x-2">
@@ -187,5 +226,15 @@
             toggleIcon.classList.add('fa-eye');
         }
     }
+
+    // Update role info message based on selection
+    document.getElementById('role').addEventListener('change', function() {
+        const roleInfo = document.getElementById('roleInfo');
+        if (this.value === 'author') {
+            roleInfo.innerHTML = 'As an <strong>Author</strong>, you\'ll be able to submit manuscripts and track their review status.';
+        } else {
+            roleInfo.innerHTML = 'As a <strong>Reviewer</strong>, you\'ll be able to review submitted manuscripts and provide feedback. You\'ll need to complete your reviewer profile after registration.';
+        }
+    });
 </script>
 @endsection

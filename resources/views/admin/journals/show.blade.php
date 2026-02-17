@@ -19,6 +19,12 @@
                             <i class="fa-regular fa-calendar mr-1"></i>
                             Submitted: {{ $journal->created_at->format('M d, Y') }}
                         </span>
+                        @if($journal->published_at)
+                            <span class="text-sm text-gray-500">
+                                <i class="fa-regular fa-calendar-check mr-1"></i>
+                                Published: {{ $journal->published_at->format('M d, Y') }}
+                            </span>
+                        @endif
                     </div>
                 </div>
                 <div class="flex items-center space-x-2">
@@ -40,9 +46,66 @@
             </div>
         </div>
 
+        <!-- Volume/Issue Information (New Section) -->
+        @if($journal->volume || $journal->issue || $journal->page_start || $journal->page_end || $journal->doi)
+        <div class="p-6 border-b border-gray-200 bg-blue-50">
+            <h2 class="text-lg font-semibold text-gray-800 mb-3">Publication Details</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                @if($journal->volume)
+                <div class="bg-white p-3 rounded-lg shadow-sm">
+                    <p class="text-xs text-gray-500 mb-1">Volume</p>
+                    <p class="font-medium text-gray-800">
+                        <a href="{{ route('admin.volumes.show', $journal->volume) }}" class="text-[#86662c] hover:underline">
+                            Volume {{ $journal->volume->volume_number }} ({{ $journal->volume->year }})
+                        </a>
+                    </p>
+                </div>
+                @endif
+
+                @if($journal->issue)
+                <div class="bg-white p-3 rounded-lg shadow-sm">
+                    <p class="text-xs text-gray-500 mb-1">Issue</p>
+                    <p class="font-medium text-gray-800">
+                        <a href="{{ route('admin.issues.show', $journal->issue) }}" class="text-[#86662c] hover:underline">
+                            Issue {{ $journal->issue->issue_number }} - {{ $journal->issue->title }}
+                        </a>
+                    </p>
+                </div>
+                @endif
+
+                @if($journal->page_start && $journal->page_end)
+                <div class="bg-white p-3 rounded-lg shadow-sm">
+                    <p class="text-xs text-gray-500 mb-1">Pages</p>
+                    <p class="font-medium text-gray-800">{{ $journal->page_start }} - {{ $journal->page_end }}</p>
+                </div>
+                @endif
+
+                @if($journal->doi)
+                <div class="bg-white p-3 rounded-lg shadow-sm">
+                    <p class="text-xs text-gray-500 mb-1">DOI</p>
+                    <p class="font-medium text-gray-800">
+                        <a href="https://doi.org/{{ $journal->doi }}" target="_blank" class="text-[#86662c] hover:underline">
+                            {{ $journal->doi }}
+                        </a>
+                    </p>
+                </div>
+                @endif
+            </div>
+        </div>
+        @endif
+
         <!-- Action Buttons -->
         <div class="p-6 border-b border-gray-200 bg-gray-50">
             <div class="flex flex-wrap items-center gap-3">
+                <!-- Add this button for Assign Reviewers -->
+                @if(in_array($journal->status, ['submitted', 'under_review', 'revision_required']))
+                    <a href="{{ route('admin.assign-reviewers.create', $journal->id) }}" 
+                    class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                        <i class="fa-solid fa-user-plus mr-2"></i>
+                        Assign Reviewers
+                    </a>
+                @endif
+
                 @if($journal->status == 'submitted')
                     <form action="{{ route('admin.journals.under-review', $journal->id) }}" method="POST" class="inline">
                         @csrf

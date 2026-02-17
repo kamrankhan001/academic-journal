@@ -28,7 +28,7 @@ class Journal extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
         static::creating(function ($journal) {
             if (!$journal->slug) {
                 $journal->slug = Str::slug($journal->title) . '-' . uniqid();
@@ -70,6 +70,71 @@ class Journal extends Model
     public function supplementaryFiles()
     {
         return $this->hasMany(JournalFile::class)->where('file_type', 'supplementary')->orderBy('order');
+    }
+
+    public function volume()
+    {
+        return $this->belongsTo(Volume::class);
+    }
+
+    public function issue()
+    {
+        return $this->belongsTo(Issue::class);
+    }
+
+    public function reviewAssignments()
+    {
+        return $this->hasMany(JournalReviewAssignment::class);
+    }
+
+    public function reviewers()
+    {
+        return $this->belongsToMany(Reviewer::class, 'journal_review_assignments')
+            ->withPivot(['status', 'recommendation', 'completed_at'])
+            ->withTimestamps();
+    }
+
+    // Add these methods
+    public function assignReviewer($reviewerId, $assignedBy, $reviewType = 'single_blind', $dueDate = null)
+    {
+        return $this->reviewAssignments()->create([
+            'reviewer_id' => $reviewerId,
+            'assigned_by' => $assignedBy,
+            'review_type' => $reviewType,
+            'assigned_at' => now(),
+            'due_date' => $dueDate ?? now()->addDays(14),
+            'status' => 'pending'
+        ]);
+    }
+
+    public function getCurrentStatusAttribute()
+    {
+        if ($this->status === 'published') {
+            return 'Published';
+        }
+
+        $pendingReviews = $this->reviewAssignments()
+            ->whereIn('status', ['pending', 'accepted', 'in_progress'])
+            ->count();
+
+        $completedReviews = $this->reviewAssignments()
+            ->where('status', 'completed')
+            ->count();
+
+        if ($completedReviews >= 2) {
+            return 'Review Complete';
+        } elseif ($pendingReviews > 0) {
+            return 'Under Review';
+        } elseif ($this->status === 'submitted') {
+            return 'Pending Assignment';
+        }
+
+        return ucfirst($this->status);
+    }
+
+    public function getDoiUrlAttribute()
+    {
+        return $this->doi ? "https://doi.org/{$this->doi}" : null;
     }
 
     // Helper methods

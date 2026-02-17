@@ -72,6 +72,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Volume/Issue</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
@@ -112,6 +113,14 @@
                                 <span class="px-3 py-1 text-xs rounded-full {{ $statusColor }}">
                                     {{ str_replace('_', ' ', ucfirst($journal->status)) }}
                                 </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                @if($journal->volume && $journal->issue)
+                                    <div class="text-sm text-gray-800">Vol {{ $journal->volume->volume_number }}, Iss {{ $journal->issue->issue_number }}</div>
+                                    <div class="text-xs text-gray-500">{{ $journal->volume->year }}</div>
+                                @else
+                                    <span class="text-xs text-gray-400">Not assigned</span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-500">
                                 {{ $journal->created_at->format('M d, Y') }}

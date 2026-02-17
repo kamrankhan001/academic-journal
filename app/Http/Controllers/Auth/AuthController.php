@@ -42,13 +42,28 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
+
             // Check if email is verified
             if (!Auth::user()->hasVerifiedEmail()) {
                 Auth::logout();
                 return redirect()->route('verification.notice')
                     ->with('warning', 'Please verify your email address before logging in.');
             }
-            return redirect()->intended('/author/dashboard');
+
+            // Redirect based on user role
+            $user = Auth::user();
+
+            switch ($user->role) {
+                case 'admin':
+                    return redirect()->intended('/admin/dashboard');
+
+                case 'reviewer':
+                    return redirect()->intended('/reviewer/dashboard');
+
+                case 'author':
+                default:
+                    return redirect()->intended('/author/dashboard');
+            }
         }
 
         return back()
@@ -88,7 +103,7 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'author',
+            'role' => $request->role,
         ]);
 
         // Handle newsletter preference
@@ -143,6 +158,11 @@ class AuthController extends Controller
                 Auth::login($user);
             }
 
+            if ($user->role === 'reviewer') {
+                return redirect('/reviewer/dashboard')
+                    ->with('info', 'Your email is already verified.');
+            }
+
             return redirect('/author/dashboard')
                 ->with('info', 'Your email is already verified.');
         }
@@ -153,6 +173,11 @@ class AuthController extends Controller
         // Log the user in (if they're not already)
         if (!Auth::check()) {
             Auth::login($user);
+        }
+
+        if ($user->role === 'reviewer') {
+            return redirect('/reviewer/dashboard')
+                ->with('success', 'Email verified successfully!');
         }
 
         return redirect('/author/dashboard')

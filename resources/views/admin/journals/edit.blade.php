@@ -149,6 +149,121 @@
                 </div>
             </div>
 
+            <!-- Volume/Issue Assignment (New Section) -->
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-2">Volume & Issue Assignment</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Volume Selection -->
+                    <div>
+                        <label for="volume_id" class="block text-sm font-medium text-gray-700 mb-2">Volume</label>
+                        <select name="volume_id" 
+                                id="volume_id"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#86662c] focus:border-transparent outline-none @error('volume_id') border-red-500 @enderror">
+                            <option value="">Select Volume (Optional)</option>
+                            @foreach($volumes as $volume)
+                                <option value="{{ $volume->id }}" {{ old('volume_id', $journal->volume_id) == $volume->id ? 'selected' : '' }}>
+                                    Volume {{ $volume->volume_number }} - {{ $volume->title }} ({{ $volume->year }})
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('volume_id')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Issue Selection -->
+                    <div>
+                        <label for="issue_id" class="block text-sm font-medium text-gray-700 mb-2">Issue</label>
+                        <select name="issue_id" 
+                                id="issue_id"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#86662c] focus:border-transparent outline-none @error('issue_id') border-red-500 @enderror">
+                            <option value="">Select Issue (Optional)</option>
+                            @foreach($issues as $issue)
+                                <option value="{{ $issue->id }}" 
+                                        data-volume="{{ $issue->volume_id }}"
+                                        {{ old('issue_id', $journal->issue_id) == $issue->id ? 'selected' : '' }}>
+                                    Issue {{ $issue->issue_number }} - {{ $issue->title }} ({{ $issue->volume->volume_number ?? 'N/A' }})
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('issue_id')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <!-- Page Numbers and DOI -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Page Start -->
+                    <div>
+                        <label for="page_start" class="block text-sm font-medium text-gray-700 mb-2">Page Start</label>
+                        <input type="number" 
+                            id="page_start" 
+                            name="page_start" 
+                            value="{{ old('page_start', $journal->page_start) }}"
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#86662c] focus:border-transparent outline-none @error('page_start') border-red-500 @enderror"
+                            placeholder="e.g., 125"
+                            min="1">
+                        @error('page_start')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Page End -->
+                    <div>
+                        <label for="page_end" class="block text-sm font-medium text-gray-700 mb-2">Page End</label>
+                        <input type="number" 
+                            id="page_end" 
+                            name="page_end" 
+                            value="{{ old('page_end', $journal->page_end) }}"
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#86662c] focus:border-transparent outline-none @error('page_end') border-red-500 @enderror"
+                            placeholder="e.g., 150"
+                            min="1">
+                        @error('page_end')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- DOI -->
+                    <div>
+                        <label for="doi" class="block text-sm font-medium text-gray-700 mb-2">DOI</label>
+                        <input type="text" 
+                            id="doi" 
+                            name="doi" 
+                            value="{{ old('doi', $journal->doi) }}"
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#86662c] focus:border-transparent outline-none @error('doi') border-red-500 @enderror"
+                            placeholder="10.1000/xyz123">
+                        @error('doi')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <!-- Current Assignment Info -->
+                @if($journal->volume || $journal->issue)
+                    <div class="mt-2 p-3 bg-blue-50 rounded-lg">
+                        <p class="text-sm text-blue-700">
+                            <i class="fa-regular fa-circle-info mr-1"></i>
+                            Currently assigned to: 
+                            @if($journal->volume)
+                                Volume {{ $journal->volume->volume_number }} ({{ $journal->volume->year }})
+                            @endif
+                            @if($journal->issue)
+                                @if($journal->volume) / @endif
+                                Issue {{ $journal->issue->issue_number }}
+                            @endif
+                            @if($journal->page_start && $journal->page_end)
+                                - Pages {{ $journal->page_start }}-{{ $journal->page_end }}
+                            @endif
+                            @if($journal->doi)
+                                - DOI: {{ $journal->doi }}
+                            @endif
+                        </p>
+                    </div>
+                @endif
+            </div>
+
             <!-- Tags with Chips Input (Fiverr Style) -->
             <div class="space-y-4">
                 <h3 class="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-2">Tags & Keywords</h3>
@@ -569,6 +684,41 @@
         const tagsChips = document.getElementById('tags-chips');
         const tagsSuggestions = document.getElementById('tags-suggestions');
         const tagsSelect = document.getElementById('tags-select');
+
+        const volumeSelect = document.getElementById('volume_id');
+        const issueSelect = document.getElementById('issue_id');
+
+        if (volumeSelect && issueSelect) {
+            // Store all issues with their volume data
+            const allIssues = Array.from(issueSelect.options).map(option => ({
+                value: option.value,
+                text: option.text,
+                volumeId: option.dataset.volume,
+                selected: option.selected
+            }));
+
+            function filterIssues() {
+                const selectedVolume = volumeSelect.value;
+                
+                // Clear current options
+                issueSelect.innerHTML = '<option value="">Select Issue (Optional)</option>';
+                
+                // Filter and add matching issues
+                allIssues.forEach(issue => {
+                    if (issue.value && (!selectedVolume || issue.volumeId === selectedVolume)) {
+                        const option = document.createElement('option');
+                        option.value = issue.value;
+                        option.textContent = issue.text;
+                        if (issue.selected && (!selectedVolume || issue.volumeId === selectedVolume)) {
+                            option.selected = true;
+                        }
+                        issueSelect.appendChild(option);
+                    }
+                });
+            }
+
+            volumeSelect.addEventListener('change', filterIssues);
+        }
         
         // Get all available tags from the select options
         const availableTags = Array.from(tagsSelect.options).map(option => ({

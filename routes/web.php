@@ -45,4 +45,5 @@ Route::prefix('newsletter')->name('newsletter.')->controller(NewsletterControlle
 
 require __DIR__ . '/auth.php';
 require __DIR__ . '/author.php';
+require __DIR__ . '/reviewer.php';
 require __DIR__ . '/admin.php';

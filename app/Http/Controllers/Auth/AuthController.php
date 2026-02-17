@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Support\Facades\URL;
 
 class AuthController extends Controller
 {
@@ -42,7 +42,7 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
-             // Check if email is verified
+            // Check if email is verified
             if (!Auth::user()->hasVerifiedEmail()) {
                 Auth::logout();
                 return redirect()->route('verification.notice')
@@ -120,11 +120,43 @@ class AuthController extends Controller
     /**
      * Verify email
      */
-    public function verifyEmail(EmailVerificationRequest $request)
+    public function verifyEmail(Request $request, $id, $hash)
     {
-        $request->fulfill();
+        // Find the user by ID from the URL
+        $user = User::findOrFail($id);
 
-        return redirect('/author/dashboard')->with('success', 'Email verified successfully!');
+        // Verify the hash matches
+        if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+            abort(403, 'Invalid verification link.');
+        }
+
+        // Check if the link has expired (using signed URL)
+        if (!URL::hasValidSignature($request)) {
+            return redirect()->route('verification.notice')
+                ->with('error', 'The verification link has expired. Please request a new one.');
+        }
+
+        // Check if already verified
+        if ($user->hasVerifiedEmail()) {
+            // Log the user in if they're not already
+            if (!Auth::check()) {
+                Auth::login($user);
+            }
+
+            return redirect('/author/dashboard')
+                ->with('info', 'Your email is already verified.');
+        }
+
+        // Mark email as verified
+        $user->markEmailAsVerified();
+
+        // Log the user in (if they're not already)
+        if (!Auth::check()) {
+            Auth::login($user);
+        }
+
+        return redirect('/author/dashboard')
+            ->with('success', 'Email verified successfully!');
     }
 
     /**

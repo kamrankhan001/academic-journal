@@ -89,6 +89,38 @@
                     @enderror
                 </div>
 
+                <!-- Revision Comments (shown when revision_required is selected) -->
+                <div id="revision-comments-field" class="space-y-4" style="display: {{ $journal->status == 'revision_required' ? 'block' : 'none' }};">
+                    <h3 class="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-2">Revision Request</h3>
+                    
+                    <div>
+                        <label for="revision_comments" class="block text-sm font-medium text-gray-700 mb-2">Revision Comments <span class="text-red-500">*</span></label>
+                        <textarea id="revision_comments" 
+                                  name="revision_comments" 
+                                  rows="4"
+                                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#86662c] focus:border-transparent outline-none"
+                                  placeholder="Provide detailed feedback to the author about what needs to be revised..."
+                                  {{ $journal->status == 'revision_required' ? 'required' : '' }}>{{ old('revision_comments') }}</textarea>
+                        <p class="text-xs text-gray-500 mt-1">These comments will be sent to the author with the revision request</p>
+                    </div>
+                </div>
+
+                <!-- Rejection Reason (shown when rejected is selected) -->
+                <div id="rejection-reason-field" class="space-y-4" style="display: {{ $journal->status == 'rejected' ? 'block' : 'none' }};">
+                    <h3 class="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-2">Rejection Reason</h3>
+                    
+                    <div>
+                        <label for="rejection_reason" class="block text-sm font-medium text-gray-700 mb-2">Rejection Reason <span class="text-red-500">*</span></label>
+                        <textarea id="rejection_reason" 
+                                  name="rejection_reason" 
+                                  rows="4"
+                                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#86662c] focus:border-transparent outline-none"
+                                  placeholder="Explain why the journal is being rejected..."
+                                  {{ $journal->status == 'rejected' ? 'required' : '' }}>{{ old('rejection_reason') }}</textarea>
+                        <p class="text-xs text-gray-500 mt-1">This reason will be sent to the author</p>
+                    </div>
+                </div>
+
                 <!-- Abstract -->
                 <div>
                     <label for="abstract" class="block text-sm font-medium text-gray-700 mb-2">Abstract</label>
@@ -485,6 +517,41 @@
             },
             placeholder: 'Write journal content here...',
         });
+
+        const statusSelect = document.getElementById('status');
+        const revisionField = document.getElementById('revision-comments-field');
+        const rejectionField = document.getElementById('rejection-reason-field');
+        const revisionTextarea = document.getElementById('revision_comments');
+        const rejectionTextarea = document.getElementById('rejection_reason');
+
+        function toggleStatusFields() {
+            const selectedStatus = statusSelect.value;
+            
+            // Hide both fields first
+            if (revisionField) revisionField.style.display = 'none';
+            if (rejectionField) rejectionField.style.display = 'none';
+            
+            // Remove required attributes
+            if (revisionTextarea) revisionTextarea.required = false;
+            if (rejectionTextarea) rejectionTextarea.required = false;
+            
+            // Show relevant field based on status
+            if (selectedStatus === 'revision_required' && revisionField) {
+                revisionField.style.display = 'block';
+                if (revisionTextarea) revisionTextarea.required = true;
+            } else if (selectedStatus === 'rejected' && rejectionField) {
+                rejectionField.style.display = 'block';
+                if (rejectionTextarea) rejectionTextarea.required = true;
+            }
+        }
+
+        // Add event listener to status dropdown
+        if (statusSelect) {
+            statusSelect.addEventListener('change', toggleStatusFields);
+        }
+
+        // Call on page load
+        toggleStatusFields();
         
         // Set initial content if exists
         const hiddenContent = document.getElementById('journal_content');

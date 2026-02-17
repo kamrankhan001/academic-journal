@@ -1,16 +1,13 @@
 # Academic Journal Management System
 
-```{=html}
 <p align="center">
-```
-`<img src="https://img.shields.io/badge/Laravel-12.x-red" alt="Laravel 12.x">`{=html}
-`<img src="https://img.shields.io/badge/PHP-8.2+-blue" alt="PHP 8.2+">`{=html}
-`<img src="https://img.shields.io/badge/MySQL-8.0+-orange" alt="MySQL 8.0+">`{=html}
-`<img src="https://img.shields.io/badge/TailwindCSS-3.x-38B2AC" alt="TailwindCSS 3.x">`{=html}
-`<img src="https://img.shields.io/badge/License-Proprietary-lightgrey" alt="Proprietary License">`{=html}
-```{=html}
+  <img src="https://img.shields.io/badge/Laravel-12.x-red" alt="Laravel 12.x">
+  <img src="https://img.shields.io/badge/PHP-8.2+-blue" alt="PHP 8.2+">
+  <img src="https://img.shields.io/badge/MySQL-8.0+-orange" alt="MySQL 8.0+">
+  <img src="https://img.shields.io/badge/TailwindCSS-3.x-38B2AC" alt="TailwindCSS 3.x">
+  <img src="https://img.shields.io/badge/License-Proprietary-lightgrey" alt="Proprietary License">
 </p>
-```
+
 ## Overview
 
 A comprehensive Academic Journal Management System built with Laravel 12
@@ -25,7 +22,7 @@ manuscript submission to final publication.
 
 ------------------------------------------------------------------------
 
-## ✨ Key Features
+## Key Features
 
 ### User Roles
 

@@ -112,9 +112,9 @@ class AdminJournalsController extends Controller
             'co_authors.*.orcid_id' => 'nullable|string|max:255',
 
             // File validation
-            'manuscript' => 'nullable|file|mimes:pdf|max:10240', // 10MB
-            'cover_image' => 'nullable|file|mimes:jpeg,png,jpg|max:2048', // 2MB
-            'supplementary_files.*' => 'nullable|file|max:10240', // 10MB per file
+            'manuscript' => 'nullable|file|mimes:pdf|max:10240',
+            'cover_image' => 'nullable|file|mimes:jpeg,png,jpg|max:2048',
+            'supplementary_files.*' => 'nullable|file|max:10240',
         ]);
 
         if ($validator->fails()) {
@@ -124,6 +124,7 @@ class AdminJournalsController extends Controller
         }
 
         $journal = Journal::findOrFail($id);
+        $oldStatus = $journal->status;
 
         // Update journal basic info
         $journal->update([
@@ -143,10 +144,7 @@ class AdminJournalsController extends Controller
 
         // Update co-authors
         if ($request->has('co_authors')) {
-            // Delete existing co-authors
             $journal->coAuthors()->delete();
-
-            // Create new co-authors
             foreach ($request->co_authors as $index => $coAuthorData) {
                 if (!empty($coAuthorData['name'])) {
                     $journal->coAuthors()->create([
@@ -159,13 +157,11 @@ class AdminJournalsController extends Controller
                 }
             }
         } else {
-            // If no co-authors provided, delete existing ones
             $journal->coAuthors()->delete();
         }
 
         // Handle manuscript upload
         if ($request->hasFile('manuscript')) {
-            // Delete old manuscript
             $oldManuscript = $journal->manuscript;
             if ($oldManuscript) {
                 \Storage::disk('public')->delete($oldManuscript->file_path);
@@ -187,7 +183,6 @@ class AdminJournalsController extends Controller
 
         // Handle cover image upload
         if ($request->hasFile('cover_image')) {
-            // Delete old cover image
             $oldCover = $journal->coverImage;
             if ($oldCover) {
                 \Storage::disk('public')->delete($oldCover->file_path);
@@ -235,6 +230,34 @@ class AdminJournalsController extends Controller
             $journal->update(['published_at' => now()]);
         }
 
+        // Send notifications based on status change
+        if ($oldStatus !== $request->status) {
+            switch ($request->status) {
+
+                case 'under_review':
+                    // Notify author
+                    $journal->author->notify(new \App\Notifications\JournalUnderReviewNotification($journal));
+                    break;
+
+                case 'revision_required':
+                    // You might want to ask for comments in the update form
+                    $revisionComments = $request->input('revision_comments', 'Please revise your journal based on the reviewer feedback.');
+                    $journal->author->notify(new \App\Notifications\JournalRevisionRequiredNotification($journal, $revisionComments));
+                    break;
+
+                case 'published':
+                    // Notify author
+                    $journal->author->notify(new \App\Notifications\JournalApprovedNotification($journal));
+                    break;
+
+                case 'rejected':
+                    // You need to add rejection reason to your update form first
+                    $rejectionReason = $request->input('rejection_reason', 'Your journal does not meet our publication criteria.');
+                    $journal->author->notify(new \App\Notifications\JournalRejectedNotification($journal, $rejectionReason));
+                    break;
+            }
+        }
+
         return redirect()
             ->route('admin.journals.show', $journal->id)
             ->with('success', 'Journal updated successfully.');
@@ -252,7 +275,7 @@ class AdminJournalsController extends Controller
         ]);
 
         // Send notification to author
-        // $journal->author->notify(new \App\Notifications\JournalApprovedNotification($journal));
+        $journal->author->notify(new \App\Notifications\JournalApprovedNotification($journal));
 
         return back()->with('success', 'Journal approved and published successfully.');
     }
@@ -266,7 +289,7 @@ class AdminJournalsController extends Controller
         $journal->update(['status' => 'under_review']);
 
         // Send notification to author
-        // $journal->author->notify(new \App\Notifications\JournalUnderReviewNotification($journal));
+        $journal->author->notify(new \App\Notifications\JournalUnderReviewNotification($journal));
 
         return back()->with('success', 'Journal moved to under review.');
     }
@@ -290,7 +313,7 @@ class AdminJournalsController extends Controller
         $journal->update(['status' => 'revision_required']);
 
         // Send notification to author with comments
-        // $journal->author->notify(new \App\Notifications\JournalRevisionRequiredNotification($journal, $request->comments));
+        $journal->author->notify(new \App\Notifications\JournalRevisionRequiredNotification($journal, $request->comments));
 
         return back()->with('success', 'Revision request sent to author.');
     }
@@ -314,7 +337,7 @@ class AdminJournalsController extends Controller
         $journal->update(['status' => 'rejected']);
 
         // Send rejection notification to author
-        // $journal->author->notify(new \App\Notifications\JournalRejectedNotification($journal, $request->reason));
+        $journal->author->notify(new \App\Notifications\JournalRejectedNotification($journal, $request->reason));
 
         return back()->with('success', 'Journal rejected.');
     }

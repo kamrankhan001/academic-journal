@@ -72,6 +72,18 @@
                             </div>
                             
                             <p class="text-sm text-gray-600 mb-2">{{ $data['message'] }}</p>
+                            @if (isset($data['revision_notes']))
+                                <div class="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                    <p class="text-xs text-yellow-800 font-medium">Revision Notes:</p>
+                                    <p class="text-xs text-yellow-700">{{ $data['revision_notes'] }}</p>
+                                </div>
+                            @endif
+                            @if (isset($data['rejection_reason']))
+                                <div class="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                    <p class="text-xs text-yellow-800 font-medium">Rejection Reason:</p>
+                                    <p class="text-xs text-yellow-700">{{ $data['rejection_reason'] }}</p>
+                                </div>
+                            @endif
                             
                             <div class="flex items-center space-x-3">
                                 <p class="text-xs text-gray-400">{{ $notification->created_at->diffForHumans() }}</p>

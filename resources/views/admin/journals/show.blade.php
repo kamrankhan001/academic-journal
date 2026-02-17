@@ -179,7 +179,7 @@
     </div>
 
     <!-- Revision Modal -->
-    <div id="revisionModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
+    <div id="revisionModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4">
             <div class="p-6">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">Request Revision</h3>
@@ -208,7 +208,7 @@
     </div>
 
     <!-- Reject Modal -->
-    <div id="rejectModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
+    <div id="rejectModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4">
             <div class="p-6">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">Reject Journal</h3>

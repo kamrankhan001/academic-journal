@@ -7,7 +7,7 @@ use App\Models\Tag;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
-class HomeController extends Controller
+class GeneralJournalController extends Controller
 {
     public function index(Request $request)
     {
@@ -102,7 +102,7 @@ class HomeController extends Controller
             ->limit(4)
             ->get();
 
-        return view('home', compact(
+        return view('journals', compact(
             'journals',
             'popularTags',
             'archives',

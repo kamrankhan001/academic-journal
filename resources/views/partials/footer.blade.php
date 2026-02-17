@@ -7,8 +7,7 @@
                     <img src="{{asset('logo.png')}}" alt="Academic Journal" class="h-10 w-auto">
                 </a>
                 <p class="mt-4 text-gray-600 text-sm leading-relaxed max-w-md">
-                    Advancing scholarly communication through open access peer-reviewed research.
-                    Publishing cutting-edge research across multiple disciplines since 1995.
+                    The Journal of Medical and Surgical Allied is a peer-reviewed, open-access scholarly journal dedicated to advancing multidisciplinary research and promoting high-quality academic communication across medical and allied health sciences.
                 </p>
                 <!-- Social Icons - Using existing social-icon class from topbar -->
                 <div class="mt-6 flex space-x-3">
@@ -78,17 +77,22 @@
                 <ul class="mt-4 space-y-4">
                     <li class="flex items-start">
                         <i class="fa-solid fa-location-dot mt-1 mr-3 text-[#86662c] w-4"></i>
-                        <span class="text-gray-600 text-sm">123 University Avenue, Academic City, AC 12345</span>
+                        <span class="text-gray-600 text-sm">
+                            Office No. A.2, Medizone
+                            Medicine Company, Backside Al-Shifa Medical Centre
+                            Dabgari Garden, Peshawar, Pakistan
+                        </span>
                     </li>
                     <li class="flex items-center">
                         <i class="fa-regular fa-envelope mr-3 text-[#86662c] w-4"></i>
                         <a href="mailto:editor@academicjournal.edu"
-                            class="text-gray-600 hover:text-[#86662c] text-sm">editor@academicjournal.edu</a>
+                            class="text-gray-600 hover:text-[#86662c] text-sm">info@jmsa.com</a>
                     </li>
                     <li class="flex items-center">
                         <i class="fa-solid fa-phone mr-3 text-[#86662c] w-4"></i>
-                        <a href="tel:+15551234567" class="text-gray-600 hover:text-[#86662c] text-sm">+1 (555)
-                            123-4567</a>
+                        <a href="tel:+15551234567" class="text-gray-600 hover:text-[#86662c] text-sm">
+                            +92 331 8008377
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -98,7 +102,7 @@
         <div class="mt-12 pt-6 border-t border-gray-200">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <p class="text-sm text-gray-500">
-                    © {{ date('Y') }} Academic Journal. All rights reserved.
+                    © {{ date('Y') }} Journal of Medical and Surgical Allied. All rights reserved.
                 </p>
                 <div class="flex space-x-6 mt-4 md:mt-0">
                     <a href="/privacy" class="text-xs {{ request()->is('privacy') ? 'text-[#86662c] font-medium' : 'text-gray-500 hover:text-[#86662c]' }}">Privacy Policy</a>

@@ -33,6 +33,41 @@ class PageController extends Controller
         return view('pages.contact');
     }
 
+    public function guidelines()
+    {
+        return view('pages.guidelines');
+    }
+
+    public function currentIssue()
+    {
+        return view('pages.current-issue');
+    }
+
+    public function announcements()
+    {
+        return view('pages.announcements');
+    }
+
+    public function editorialTeam()
+    {
+        return view('pages.editorial-team');
+    }
+
+    public function editorialPolicy()
+    {
+        return view('pages.editorial-policies');
+    }
+
+    public function journalPolicies()
+    {
+        return view('pages.journal-policies');
+    }
+
+    public function reviewers()
+    {
+        return view('pages.reviewers');
+    }
+
     /**
      * Show the privacy policy page
      */

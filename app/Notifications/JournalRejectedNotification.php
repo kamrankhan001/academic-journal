@@ -8,15 +8,17 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class JournalUnderReviewNotification extends Notification implements ShouldQueue
+class JournalRejectedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(public Journal $journal)
-    {
+    public function __construct(
+        public Journal $journal,
+        public ?string $rejection_reason = null
+    ) {
     }
 
     /**
@@ -35,31 +37,37 @@ class JournalUnderReviewNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Journal Under Review: ' . $this->journal->title)
-            ->view('emails.notifications.journal-under-review', [
-                'journal' => $this->journal
+            ->subject('Journal Submission Update: ' . $this->journal->title)
+            ->view('emails.notifications.journal-rejected', [
+                'journal' => $this->journal,
+                'rejection_reason' => $this->rejection_reason
             ]);
     }
-
 
     /**
      * Get the database representation of the notification.
      */
     public function toDatabase($notifiable): array
     {
-        return [
-            'type' => 'journal_under_review',
+        $data = [
+            'type' => 'journal_rejected',
             'journal_id' => $this->journal->id,
             'journal_title' => $this->journal->title,
             'journal_slug' => $this->journal->slug,
-            'message' => 'Your journal "' . $this->journal->title . '" is now under review.',
-            'icon' => 'fa-regular fa-clock',
-            'icon_bg' => 'bg-purple-100',
-            'icon_color' => 'text-purple-700',
+            'message' => 'Your journal "' . $this->journal->title . '" has been reviewed.',
+            'icon' => 'fa-regular fa-circle-xmark',
+            'icon_bg' => 'bg-red-100',
+            'icon_color' => 'text-red-700',
             'action_url' => route('author.journals.show', $this->journal->id),
-            'action_text' => 'Track Progress',
+            'action_text' => 'View Details',
             'created_at' => now()->toDateTimeString(),
         ];
+
+        if ($this->rejection_reason) {
+            $data['rejection_reason'] = $this->rejection_reason;
+        }
+
+        return $data;
     }
 
     /**
@@ -72,7 +80,8 @@ class JournalUnderReviewNotification extends Notification implements ShouldQueue
         return [
             'journal_id' => $this->journal->id,
             'journal_title' => $this->journal->title,
-            'type' => 'journal_under_review',
+            'rejection_reason' => $this->rejection_reason,
+            'type' => 'journal_rejected',
         ];
     }
 }

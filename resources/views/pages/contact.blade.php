@@ -91,38 +91,54 @@
 
         <!-- Contact Information -->
         <div>
-            <h2 class="text-xl font-bold text-gray-800 mb-6">Contact Information</h2>
+            <h2 class="text-xl font-bold text-gray-800 mb-6">Editorial Office</h2>
             
-            <div class="space-y-6">
-                <div class="flex items-start space-x-4">
-                    <div class="w-10 h-10 bg-[#86662c]/10 rounded-lg flex items-center justify-center shrink-0">
-                        <i class="fa-solid fa-location-dot text-[#86662c]"></i>
+            <div class="bg-linear-to-br from-[#86662c]/5 to-[#6b4f23]/5 rounded-2xl p-6 border border-[#86662c]/20 mb-6">
+                <h3 class="font-bold text-lg text-gray-800 mb-3">Journal of Medical and Surgical Allied</h3>
+                
+                <div class="space-y-5">
+                    <!-- Address -->
+                    <div class="flex items-start space-x-4">
+                        <div class="w-10 h-10 bg-[#86662c]/10 rounded-lg flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-location-dot text-[#86662c]"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800 text-sm">Address</h4>
+                            <p class="text-sm text-gray-600 leading-relaxed">
+                                Office No. A.2, Medizone<br>
+                                Medicine Company, Backside Al-Shifa Medical Centre<br>
+                                Dabgari Garden, Peshawar, Pakistan
+                            </p>
+                        </div>
                     </div>
-                    <div>
-                        <h3 class="font-semibold text-gray-800">Office Address</h3>
-                        <p class="text-sm text-gray-600">123 University Avenue<br>Academic City, AC 12345<br>United States</p>
-                    </div>
-                </div>
 
-                <div class="flex items-start space-x-4">
-                    <div class="w-10 h-10 bg-[#86662c]/10 rounded-lg flex items-center justify-center shrink-0">
-                        <i class="fa-regular fa-envelope text-[#86662c]"></i>
+                    <!-- Email -->
+                    <div class="flex items-start space-x-4">
+                        <div class="w-10 h-10 bg-[#86662c]/10 rounded-lg flex items-center justify-center shrink-0">
+                            <i class="fa-regular fa-envelope text-[#86662c]"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800 text-sm">Email</h4>
+                            <a href="mailto:info@jmsa.com" class="text-sm text-[#86662c] hover:text-[#6b4f23] hover:underline block">
+                                info@jmsa.com
+                            </a>
+                            <a href="mailto:editorial@jmsa.com" class="text-sm text-[#86662c] hover:text-[#6b4f23] hover:underline block">
+                                editorial@jmsa.com
+                            </a>
+                        </div>
                     </div>
-                    <div>
-                        <h3 class="font-semibold text-gray-800">Email</h3>
-                        <p class="text-sm text-gray-600">editorial@academicjournal.edu</p>
-                        <p class="text-sm text-gray-600">support@academicjournal.edu</p>
-                    </div>
-                </div>
 
-                <div class="flex items-start space-x-4">
-                    <div class="w-10 h-10 bg-[#86662c]/10 rounded-lg flex items-center justify-center shrink-0">
-                        <i class="fa-solid fa-phone text-[#86662c]"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-semibold text-gray-800">Phone</h3>
-                        <p class="text-sm text-gray-600">+1 (555) 123-4567</p>
-                        <p class="text-sm text-gray-600">+1 (555) 123-4568</p>
+                    <!-- Phone -->
+                    <div class="flex items-start space-x-4">
+                        <div class="w-10 h-10 bg-[#86662c]/10 rounded-lg flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-phone text-[#86662c]"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800 text-sm">Phone</h4>
+                            <a href="tel:+923318008377" class="text-sm text-[#86662c] hover:text-[#6b4f23] hover:underline">
+                                +92 331 8008377
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

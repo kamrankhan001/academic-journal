@@ -70,13 +70,10 @@
             </form>
 
             <!-- Subscriber count -->
-            @php
-                $subscriberCount = App\Models\NewsletterSubscription::where('is_subscribed', true)
-                    ->where('is_verified', true)
-                    ->count();
-            @endphp
             <p class="text-xs text-gray-500 mt-6">
-                <span class="font-medium text-gray-700">{{ number_format($subscriberCount) }}+</span> researchers already subscribed
+                <span class="font-medium text-gray-700">
+                    500+
+                </span> researchers already subscribed
             </p>
         </div>
     </div>

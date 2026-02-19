@@ -25,7 +25,11 @@
 
         <!-- Navigation -->
         <nav class="flex-1 overflow-y-auto py-4">
-            <ul class="space-y-1 px-3">
+            <!-- Section 1: Main -->
+            <div class="px-3 mb-2">
+                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Main</p>
+            </div>
+            <ul class="space-y-1 px-3 mb-6">
                 <!-- Dashboard Overview -->
                 <li>
                     <a href="{{ route('author.index') }}"
@@ -35,50 +39,49 @@
                         <span class="ml-3 text-sm font-medium">Dashboard</span>
                     </a>
                 </li>
+            </ul>
 
+            <!-- Section 2: Submissions -->
+            <div class="px-3 mb-2">
+                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Submissions</p>
+            </div>
+            <ul class="space-y-1 px-3 mb-6">
                 <!-- My Journals (Submissions) -->
                 <li>
                     <a href="{{ route('author.journals.index') }}"
                         class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-[#86662c]/10 hover:text-[#86662c] transition-colors group {{ request()->routeIs('author.journals.*') ? 'bg-[#86662c]/10 text-[#86662c]' : '' }}">
                         <i
-                            class="fa-regular fa-file-lines w-5 text-gray-400 group-hover:text-[#86662c] {{ request()->routeIs('author.journals.*') ? 'text-[#86662c]' : '' }}"></i>
+                            class="fa-solid fa-file-lines w-5 text-gray-400 group-hover:text-[#86662c] {{ request()->routeIs('author.journals.*') ? 'text-[#86662c]' : '' }}"></i>
                         <span class="ml-3 text-sm font-medium">My Journals</span>
                     </a>
                 </li>
             </ul>
 
-            <div class="border-t border-gray-200 my-4"></div>
-
-            <ul class="space-y-1 px-3">
-                <!-- Profile Settings -->
-                <li>
-                    <a href="{{ route('author.profile') }}"
-                        class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-[#86662c]/10 hover:text-[#86662c] transition-colors group {{ request()->routeIs('author.profile') ? 'bg-[#86662c]/10 text-[#86662c]' : '' }}">
-                        <i
-                            class="fa-regular fa-user w-5 text-gray-400 group-hover:text-[#86662c] {{ request()->routeIs('author.profile') ? 'text-[#86662c]' : '' }}"></i>
-                        <span class="ml-3 text-sm font-medium">Profile</span>
-                    </a>
-                </li>
-
+            <!-- Section 3: Account -->
+            <div class="px-3 mb-2">
+                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Account</p>
+            </div>
+            <ul class="space-y-1 px-3 mb-6">
                 <!-- Notifications -->
                 <li>
                     <a href="{{ route('author.notifications') }}"
                         class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-[#86662c]/10 hover:text-[#86662c] transition-colors group {{ request()->routeIs('author.notifications') ? 'bg-[#86662c]/10 text-[#86662c]' : '' }}">
                         <i
-                            class="fa-regular fa-bell w-5 text-gray-400 group-hover:text-[#86662c] {{ request()->routeIs('author.notifications') ? 'text-[#86662c]' : '' }}"></i>
+                            class="fa-solid fa-bell w-5 text-gray-400 group-hover:text-[#86662c] {{ request()->routeIs('author.notifications') ? 'text-[#86662c]' : '' }}"></i>
                         <span class="ml-3 text-sm font-medium">Notifications</span>
-                        @php
-                            $unreadCount = Auth::user()->unreadNotifications->count();
-                        @endphp
-                        @if($unreadCount > 0)
-                            <span id="sidebarNotificationBadge"
-                                class="ml-auto bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                                {{ $unreadCount > 9 ? '9+' : $unreadCount }}
-                            </span>
-                        @else
-                            <span id="sidebarNotificationBadge"
-                                class="hidden ml-auto bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"></span>
-                        @endif
+                        <span id="notificationBadge"
+                            class="ml-auto bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">
+                        </span>
+                    </a>
+                </li>
+
+                <!-- Profile Settings -->
+                <li>
+                    <a href="{{ route('author.profile') }}"
+                        class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-[#86662c]/10 hover:text-[#86662c] transition-colors group {{ request()->routeIs('author.profile') ? 'bg-[#86662c]/10 text-[#86662c]' : '' }}">
+                        <i
+                            class="fa-solid fa-user w-5 text-gray-400 group-hover:text-[#86662c] {{ request()->routeIs('author.profile') ? 'text-[#86662c]' : '' }}"></i>
+                        <span class="ml-3 text-sm font-medium">Profile</span>
                     </a>
                 </li>
             </ul>
@@ -97,3 +100,32 @@
         </div>
     </div>
 </aside>
+
+<script>
+function loadNotificationCount() {
+    fetch("{{ route('author.notifications.unread-count') }}")
+        .then(res => res.json())
+        .then(data => {
+            const badge = document.getElementById('notificationBadge');
+
+            if (!badge) return;
+
+            if (data.count > 0) {
+                badge.classList.remove('hidden');
+                badge.innerText = data.count > 9 ? '9+' : data.count;
+            } else {
+                badge.classList.add('hidden');
+            }
+        });
+}
+
+// Load on page start
+loadNotificationCount();
+
+// Reload when user returns to tab
+document.addEventListener("visibilitychange", function () {
+    if (!document.hidden) {
+        loadNotificationCount();
+    }
+});
+</script>

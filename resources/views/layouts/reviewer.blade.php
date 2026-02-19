@@ -5,6 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    <!-- Session Messages Meta Tags -->
+    @if(session('success'))
+        <meta name="session-success" content="{{ session('success') }}">
+    @endif
+    @if(session('error'))
+        <meta name="session-error" content="{{ session('error') }}">
+    @endif
+    @if(session('warning'))
+        <meta name="session-warning" content="{{ session('warning') }}">
+    @endif
+    @if(session('info'))
+        <meta name="session-info" content="{{ session('info') }}">
+    @endif
+    @if(session('message'))
+        <meta name="session-message" content="{{ session('message') }}">
+    @endif
+
     <title>@yield('title', 'Reviewer Dashboard - Journal of Medical and Surgical Allied')</title>
 
     <!-- Fonts -->

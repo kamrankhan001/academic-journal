@@ -1,71 +1,84 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Reviewer;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class NotificationController extends Controller
+class ReviewerNotificationController extends Controller
 {
     public function index(Request $request)
     {
         $filter = $request->get('filter', 'all');
-
+        
         $query = DB::table('notifications')
+            ->where('notifiable_id', auth()->id())
+            ->where('notifiable_type', 'App\Models\User')
             ->orderBy('created_at', 'desc');
-
+        
         // Apply filter
         if ($filter === 'unread') {
             $query->whereNull('read_at');
         } elseif ($filter === 'read') {
             $query->whereNotNull('read_at');
         }
-
+        
         $notifications = $query->paginate(20)->withQueryString();
-
-        return view('admin.notifications.index', compact('notifications', 'filter'));
+        
+        return view('reviewer.notifications.index', compact('notifications', 'filter'));
     }
 
     public function markAsRead($id)
     {
-        $notification = DB::table('notifications')->where('id', $id)->first();
-
+        $notification = DB::table('notifications')
+            ->where('id', $id)
+            ->where('notifiable_id', auth()->id())
+            ->first();
+        
         if ($notification && is_null($notification->read_at)) {
             DB::table('notifications')
                 ->where('id', $id)
                 ->update(['read_at' => now()]);
         }
-
+        
         return response()->json(['success' => true]);
     }
 
     public function markAllRead()
     {
-        // This marks only the CURRENT USER's notifications as read
-        auth()->user()->unreadNotifications->markAsRead();
-
-        // For JSON requests (AJAX from header)
+        DB::table('notifications')
+            ->where('notifiable_id', auth()->id())
+            ->where('notifiable_type', 'App\Models\User')
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+        
         if (request()->wantsJson()) {
             return response()->json(['success' => true]);
         }
-
-        // For form submissions (from notifications page)
-        return redirect()->route('admin.notifications.index')
+        
+        return redirect()->route('reviewer.notifications.index')
             ->with('success', 'All notifications marked as read.');
     }
 
     public function destroy($id)
     {
-        DB::table('notifications')->where('id', $id)->delete();
-
+        DB::table('notifications')
+            ->where('id', $id)
+            ->where('notifiable_id', auth()->id())
+            ->delete();
+        
         return response()->json(['success' => true]);
     }
 
     public function unreadCount()
     {
-        $count = auth()->user()->unreadNotifications->count();
-
+        $count = DB::table('notifications')
+            ->where('notifiable_id', auth()->id())
+            ->where('notifiable_type', 'App\Models\User')
+            ->whereNull('read_at')
+            ->count();
+        
         return response()->json(['count' => $count]);
     }
 }

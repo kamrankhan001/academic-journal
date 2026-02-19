@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Reviewer\DashboardController as ReviewerDashboardController;
 use App\Http\Controllers\Reviewer\ReviewController as ReviewerReviewController;
+use App\Http\Controllers\Reviewer\ReviewerNotificationController;
 
 
 // Reviewer Protected Routes
@@ -24,8 +25,12 @@ Route::middleware(['auth', 'reviewer'])->prefix('reviewer')->name('reviewer.')->
         Route::post('assignments/{assignment}/submit', 'submit')->name('assignments.submit');
     });
 
-    Route::get('notifications', function() {
-        // Placeholder for notifications page
-        return view('reviewer.notifications');
-    })->name('notifications');
+    Route::prefix('notifications')->name('notifications.')->controller(ReviewerNotificationController::class)->group(function(){
+        Route::get('/', 'index')->name('index');
+        Route::post('/{id}/mark-as-read','markAsRead')->name('mark-as-read');
+        Route::post('/mark-all-read','markAllRead')->name('mark-all-read');
+        Route::delete('/{id}','destroy')->name('destroy');
+        Route::get('/unread-count','unreadCount')->name('unread-count');
+    });
+
 });

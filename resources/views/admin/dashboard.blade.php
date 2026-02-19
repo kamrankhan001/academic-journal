@@ -8,7 +8,7 @@
 @endsection
 
 @section('content')
-    <!-- Quick Stats -->
+    <!-- Quick Stats - Row 1 -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         <div class="bg-white rounded-xl shadow-soft border border-gray-200 p-6 hover:shadow-lg transition-shadow">
             <div class="flex items-center justify-between">
@@ -91,32 +91,178 @@
         </div>
     </div>
 
-    <!-- Charts Row -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <!-- Journals by Month Chart -->
-        <div class="bg-white rounded-xl shadow-soft border border-gray-200 p-6">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-800">Journals Overview</h3>
-                <div class="flex space-x-2">
-                    <button class="chart-period-btn active px-3 py-1 text-xs rounded-lg bg-amber-100 text-amber-700" data-period="6m">6 Months</button>
-                    <button class="chart-period-btn px-3 py-1 text-xs rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200" data-period="12m">12 Months</button>
+    <!-- Quick Stats - Row 2 (Volume, Issues, Reviewers, Assignments) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <div class="bg-white rounded-xl shadow-soft border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 font-medium">Volumes</p>
+                    <p class="text-3xl font-bold text-gray-800 mt-1">{{ $stats['total_volumes'] }}</p>
+                    <p class="text-xs text-green-600 mt-2">
+                        <i class="fa-solid fa-book-open mr-1"></i>
+                        {{ $stats['published_volumes'] }} published
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-book-open text-indigo-600 text-xl"></i>
                 </div>
             </div>
-            <div class="h-80 relative">
-                <canvas id="journalsChart"></canvas>
+            <div class="mt-4">
+                <a href="{{ route('admin.volumes.index') }}" class="text-xs text-indigo-600 hover:text-indigo-700 font-medium">
+                    Manage Volumes <i class="fa-solid fa-arrow-right ml-1"></i>
+                </a>
             </div>
         </div>
 
-        <!-- Journals by Status Chart -->
-        <div class="bg-white rounded-xl shadow-soft border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Journals by Status</h3>
-            <div class="h-80 relative">
-                <canvas id="statusChart"></canvas>
+        <div class="bg-white rounded-xl shadow-soft border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 font-medium">Issues</p>
+                    <p class="text-3xl font-bold text-gray-800 mt-1">{{ $stats['total_issues'] }}</p>
+                    <p class="text-xs text-green-600 mt-2">
+                        <i class="fa-solid fa-newspaper mr-1"></i>
+                        {{ $stats['published_issues'] }} published
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-newspaper text-cyan-600 text-xl"></i>
+                </div>
+            </div>
+            <div class="mt-4">
+                <a href="{{ route('admin.issues.index') }}" class="text-xs text-cyan-600 hover:text-cyan-700 font-medium">
+                    Manage Issues <i class="fa-solid fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-soft border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 font-medium">Reviewers</p>
+                    <p class="text-3xl font-bold text-gray-800 mt-1">{{ $stats['total_reviewer_profiles'] }}</p>
+                    <p class="text-xs mt-2">
+                        <span class="text-green-600"><i class="fa-regular fa-circle-check mr-1"></i>{{ $stats['active_reviewers'] }} active</span>
+                        <span class="text-yellow-600 ml-2"><i class="fa-regular fa-clock mr-1"></i>{{ $stats['pending_reviewers'] }} pending</span>
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="mt-4">
+                <a href="{{ route('admin.reviewers.index') }}" class="text-xs text-purple-600 hover:text-purple-700 font-medium">
+                    Manage Reviewers <i class="fa-solid fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-soft border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 font-medium">Assignments</p>
+                    <p class="text-3xl font-bold text-gray-800 mt-1">{{ $stats['total_assignments'] }}</p>
+                    <p class="text-xs mt-2">
+                        <span class="text-yellow-600"><i class="fa-regular fa-clock mr-1"></i>{{ $stats['pending_assignments'] }} pending</span>
+                        <span class="text-green-600 ml-2"><i class="fa-regular fa-circle-check mr-1"></i>{{ $stats['completed_assignments'] }} completed</span>
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 text-amber-600" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="mt-4">
+                <a href="{{ route('admin.assignments.index') }}" class="text-xs text-amber-600 hover:text-amber-700 font-medium">
+                    View Assignments <i class="fa-solid fa-arrow-right ml-1"></i>
+                </a>
             </div>
         </div>
     </div>
 
-    <!-- Second Row -->
+    <!-- Mini Stats Row -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+        <div class="bg-linear-to-r from-purple-50 to-purple-100 rounded-xl p-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-purple-600 font-medium">Overdue Reviews</p>
+                    <p class="text-2xl font-bold text-purple-700">{{ $stats['overdue_assignments'] }}</p>
+                </div>
+                <div class="w-10 h-10 bg-purple-200 rounded-lg flex items-center justify-center">
+                    <i class="fa-regular fa-clock text-purple-600"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-linear-to-r from-green-50 to-green-100 rounded-xl p-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-green-600 font-medium">Published Volumes</p>
+                    <p class="text-2xl font-bold text-green-700">{{ $stats['published_volumes'] }}</p>
+                </div>
+                <div class="w-10 h-10 bg-green-200 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-book-open text-green-600"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-linear-to-r from-cyan-50 to-cyan-100 rounded-xl p-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-cyan-600 font-medium">Published Issues</p>
+                    <p class="text-2xl font-bold text-cyan-700">{{ $stats['published_issues'] }}</p>
+                </div>
+                <div class="w-10 h-10 bg-cyan-200 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-newspaper text-cyan-600"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-linear-to-r from-amber-50 to-amber-100 rounded-xl p-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-amber-600 font-medium">Active Reviewers</p>
+                    <p class="text-2xl font-bold text-amber-700">{{ $stats['active_reviewers'] }}</p>
+                </div>
+                <div class="w-10 h-10 bg-amber-200 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <!-- Journals by Month Chart -->
+        <div class="lg:col-span-1 bg-white rounded-xl shadow-soft border border-gray-200 p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Journals by Month</h3>
+            <div class="h-64 relative">
+                <canvas id="journalsMiniChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Journals by Status Chart -->
+        <div class="lg:col-span-1 bg-white rounded-xl shadow-soft border border-gray-200 p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Journals by Status</h3>
+            <div class="h-64 relative">
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Assignments by Status Chart -->
+        <div class="lg:col-span-1 bg-white rounded-xl shadow-soft border border-gray-200 p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Assignments by Status</h3>
+            <div class="h-64 relative">
+                <canvas id="assignmentsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Second Row - Top Lists -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <!-- Top Authors -->
         <div class="bg-white rounded-xl shadow-soft border border-gray-200 p-6">
@@ -158,6 +304,40 @@
             </div>
         </div>
 
+        <!-- Top Reviewers -->
+        <div class="bg-white rounded-xl shadow-soft border border-gray-200 p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Top Reviewers</h3>
+            <div class="space-y-4">
+                @forelse($topReviewers as $reviewer)
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
+                                <span class="text-purple-700 text-xs font-bold">
+                                    {{ strtoupper(substr($reviewer->user->name, 0, 2)) }}
+                                </span>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-800">{{ Str::limit($reviewer->user->name, 20) }}</p>
+                                <p class="text-xs text-gray-500">{{ $reviewer->review_assignments_count }} assignments</p>
+                            </div>
+                        </div>
+                        <a href="{{ route('admin.reviewers.show', $reviewer->id) }}" 
+                           class="text-purple-600 hover:text-purple-700 text-xs">
+                            View
+                        </a>
+                    </div>
+                @empty
+                    <p class="text-sm text-gray-500 text-center py-4">No reviewers yet</p>
+                @endforelse
+            </div>
+            <div class="mt-4 pt-4 border-t border-gray-200">
+                <a href="{{ route('admin.reviewers.index') }}" 
+                   class="text-sm text-purple-600 hover:text-purple-700 font-medium">
+                    View All Reviewers <i class="fa-solid fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+        </div>
+
         <!-- Popular Tags -->
         <div class="bg-white rounded-xl shadow-soft border border-gray-200 p-6">
             <h3 class="text-lg font-semibold text-gray-800 mb-4">Popular Tags</h3>
@@ -189,43 +369,106 @@
                 </a>
             </div>
         </div>
+    </div>
 
-        <!-- Recent Users -->
-        <div class="bg-white rounded-xl shadow-soft border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Recent Users</h3>
-            <div class="space-y-4">
-                @forelse($recentUsers as $user)
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
-                                @if($user->profile && $user->profile->avatar)
-                                    <img src="{{ asset('storage/' . $user->profile->avatar) }}" 
-                                         alt="{{ $user->name }}"
-                                         class="w-8 h-8 rounded-full object-cover">
-                                @else
-                                    <span class="text-amber-700 text-xs font-bold">
-                                        {{ strtoupper(substr($user->name, 0, 2)) }}
+    <!-- Recent Items Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <!-- Recent Volumes -->
+        <div class="bg-white rounded-xl shadow-soft border border-gray-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <h3 class="text-lg font-semibold text-gray-800">Recent Volumes</h3>
+            </div>
+            <div class="divide-y divide-gray-200">
+                @forelse($recentVolumes as $volume)
+                    <div class="p-4 hover:bg-gray-50 transition-colors">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <a href="{{ route('admin.volumes.show', $volume->id) }}" 
+                                   class="text-sm font-medium text-gray-800 hover:text-indigo-600">
+                                    {{ $volume->title }}
+                                </a>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    <span class="text-xs text-gray-500">
+                                        Volume {{ $volume->volume_number }} • {{ $volume->year }}
                                     </span>
+                                    <span class="text-xs text-gray-400">•</span>
+                                    <span class="text-xs text-gray-500">
+                                        {{ $volume->created_at->diffForHumans() }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                @if($volume->status === 'published')
+                                    <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">Published</span>
+                                @elseif($volume->status === 'in_progress')
+                                    <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">In Progress</span>
+                                @else
+                                    <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700">Planned</span>
                                 @endif
                             </div>
-                            <div>
-                                <p class="text-sm font-medium text-gray-800">{{ Str::limit($user->name, 20) }}</p>
-                                <p class="text-xs text-gray-500">{{ ucfirst($user->role) }} • {{ $user->created_at->diffForHumans() }}</p>
-                            </div>
                         </div>
-                        <a href="{{ route('admin.users.show', $user->id) }}" 
-                           class="text-amber-600 hover:text-amber-700 text-xs">
-                            View
-                        </a>
                     </div>
                 @empty
-                    <p class="text-sm text-gray-500 text-center py-4">No users yet</p>
+                    <div class="p-8 text-center">
+                        <i class="fa-solid fa-book-open text-4xl text-gray-300 mb-3"></i>
+                        <p class="text-gray-500">No volumes yet</p>
+                    </div>
                 @endforelse
             </div>
-            <div class="mt-4 pt-4 border-t border-gray-200">
-                <a href="{{ route('admin.users.index') }}" 
-                   class="text-sm text-amber-600 hover:text-amber-700 font-medium">
-                    View All Users <i class="fa-solid fa-arrow-right ml-1"></i>
+            <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+                <a href="{{ route('admin.volumes.index') }}" 
+                   class="text-sm text-indigo-600 hover:text-indigo-700 font-medium">
+                    View All Volumes <i class="fa-solid fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Recent Issues -->
+        <div class="bg-white rounded-xl shadow-soft border border-gray-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <h3 class="text-lg font-semibold text-gray-800">Recent Issues</h3>
+            </div>
+            <div class="divide-y divide-gray-200">
+                @forelse($recentIssues as $issue)
+                    <div class="p-4 hover:bg-gray-50 transition-colors">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <a href="{{ route('admin.issues.show', $issue->id) }}" 
+                                   class="text-sm font-medium text-gray-800 hover:text-cyan-600">
+                                    {{ $issue->title }}
+                                </a>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    <span class="text-xs text-gray-500">
+                                        Vol {{ $issue->volume->volume_number ?? 'N/A' }} • Issue {{ $issue->issue_number }}
+                                    </span>
+                                    <span class="text-xs text-gray-400">•</span>
+                                    <span class="text-xs text-gray-500">
+                                        {{ $issue->created_at->diffForHumans() }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                @if($issue->status === 'published')
+                                    <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">Published</span>
+                                @elseif($issue->status === 'in_progress')
+                                    <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">In Progress</span>
+                                @else
+                                    <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700">Planned</span>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="p-8 text-center">
+                        <i class="fa-solid fa-newspaper text-4xl text-gray-300 mb-3"></i>
+                        <p class="text-gray-500">No issues yet</p>
+                    </div>
+                @endforelse
+            </div>
+            <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+                <a href="{{ route('admin.issues.index') }}" 
+                   class="text-sm text-cyan-600 hover:text-cyan-700 font-medium">
+                    View All Issues <i class="fa-solid fa-arrow-right ml-1"></i>
                 </a>
             </div>
         </div>
@@ -397,14 +640,50 @@
             }
         });
 
-        // Journals by Month Chart
-        const journalsCtx = document.getElementById('journalsChart').getContext('2d');
-        let journalsChart = new Chart(journalsCtx, {
+        // Assignments by Status Chart
+        const assignmentsCtx = document.getElementById('assignmentsChart').getContext('2d');
+        new Chart(assignmentsCtx, {
+            type: 'doughnut',
+            data: {
+                labels: {!! json_encode(array_keys($assignmentsByStatus)) !!},
+                datasets: [{
+                    data: {!! json_encode(array_values($assignmentsByStatus)) !!},
+                    backgroundColor: [
+                        '#f59e0b', // pending - amber
+                        '#8b5cf6', // in progress - purple
+                        '#10b981', // completed - green
+                        '#6b7280', // declined - gray
+                    ],
+                    borderWidth: 0,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 15,
+                            font: {
+                                size: 11
+                            }
+                        }
+                    }
+                },
+                cutout: '70%',
+            }
+        });
+
+        // Journals Mini Chart
+        const journalsMiniCtx = document.getElementById('journalsMiniChart').getContext('2d');
+        new Chart(journalsMiniCtx, {
             type: 'line',
             data: {
                 labels: {!! json_encode($months) !!},
                 datasets: [{
-                    label: 'Journals Submitted',
+                    label: 'Journals',
                     data: {!! json_encode($journalsByMonth) !!},
                     borderColor: '#86662c',
                     backgroundColor: 'rgba(134, 102, 44, 0.1)',
@@ -413,7 +692,7 @@
                     pointBackgroundColor: '#86662c',
                     pointBorderColor: '#fff',
                     pointBorderWidth: 2,
-                    pointRadius: 4,
+                    pointRadius: 3,
                 }]
             },
             options: {
@@ -431,40 +710,24 @@
                             color: 'rgba(0, 0, 0, 0.05)',
                         },
                         ticks: {
-                            stepSize: 1
+                            stepSize: 1,
+                            font: {
+                                size: 10
+                            }
                         }
                     },
                     x: {
                         grid: {
                             display: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 10
+                            }
                         }
                     }
                 }
             }
-        });
-
-        // Chart period buttons
-        document.querySelectorAll('.chart-period-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const period = this.dataset.period;
-                
-                // Update active state
-                document.querySelectorAll('.chart-period-btn').forEach(b => {
-                    b.classList.remove('active', 'bg-amber-100', 'text-amber-700');
-                    b.classList.add('bg-gray-100', 'text-gray-600');
-                });
-                this.classList.remove('bg-gray-100', 'text-gray-600');
-                this.classList.add('active', 'bg-amber-100', 'text-amber-700');
-                
-                // Fetch new data
-                fetch(`{{ route('admin.chart-data') }}?type=journals&period=${period}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        journalsChart.data.labels = data.labels;
-                        journalsChart.data.datasets[0].data = data.data;
-                        journalsChart.update();
-                    });
-            });
         });
 
         // Auto-refresh quick stats every 5 minutes
@@ -472,7 +735,6 @@
             fetch('{{ route("admin.quick-stats") }}')
                 .then(response => response.json())
                 .then(data => {
-                    // Update stats if needed
                     console.log('Stats refreshed:', data);
                 });
         }, 300000); // 5 minutes

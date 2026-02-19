@@ -4,6 +4,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    
+    <!-- Session Messages Meta Tags -->
+    @if(session('success'))
+        <meta name="session-success" content="{{ session('success') }}">
+    @endif
+    @if(session('error'))
+        <meta name="session-error" content="{{ session('error') }}">
+    @endif
+    @if(session('warning'))
+        <meta name="session-warning" content="{{ session('warning') }}">
+    @endif
+    @if(session('info'))
+        <meta name="session-info" content="{{ session('info') }}">
+    @endif
+    @if(session('message'))
+        <meta name="session-message" content="{{ session('message') }}">
+    @endif
 
     <title>@yield('title', 'Admin Dashboard - Academic Journal')</title>
 
@@ -21,6 +38,9 @@
     @stack('styles')
 </head>
 <body class="font-sans antialiased bg-gray-50">
+    <!-- Toast Container (will be created by JS if not present) -->
+    <div id="toastContainer" class="toast-container"></div>
+
     <div class="min-h-screen relative">
         <!-- Sidebar -->
         @include('admin.partials.sidebar')

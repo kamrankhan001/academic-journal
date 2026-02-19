@@ -315,6 +315,87 @@
                     </div>
                 </form>
             </div>
+
+            <!-- Change Password Form -->
+            <div class="bg-white rounded-xl shadow-soft border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Change Password</h3>
+
+                <form id="passwordForm" method="POST" action="{{ route('author.password.update') }}" class="space-y-4">
+                    @csrf
+                    @method('PUT')
+
+                    <div>
+                        <label for="current_password" class="block text-sm font-medium text-gray-700 mb-2">Current
+                            Password</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fa-solid fa-lock text-gray-400"></i>
+                            </div>
+                            <input type="password" id="current_password" name="current_password"
+                                class="w-full pl-10 pr-10 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#86662c] focus:border-transparent outline-none @error('current_password') border-red-500 @enderror"
+                                required>
+                            <button type="button"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-[#86662c]"
+                                onclick="togglePassword('current_password', 'toggleCurrentIcon')">
+                                <i class="fa-regular fa-eye" id="toggleCurrentIcon"></i>
+                            </button>
+                        </div>
+                        @error('current_password')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label for="new_password" class="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fa-solid fa-lock text-gray-400"></i>
+                            </div>
+                            <input type="password" id="new_password" name="new_password"
+                                class="w-full pl-10 pr-10 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#86662c] focus:border-transparent outline-none @error('new_password') border-red-500 @enderror"
+                                required>
+                            <button type="button"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-[#86662c]"
+                                onclick="togglePassword('new_password', 'toggleNewIcon')">
+                                <i class="fa-regular fa-eye" id="toggleNewIcon"></i>
+                            </button>
+                        </div>
+                        @error('new_password')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                        <p class="text-xs text-gray-500 mt-1">Minimum 8 characters</p>
+                    </div>
+
+                    <div>
+                        <label for="new_password_confirmation" class="block text-sm font-medium text-gray-700 mb-2">Confirm
+                            New Password</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fa-solid fa-lock text-gray-400"></i>
+                            </div>
+                            <input type="password" id="new_password_confirmation" name="new_password_confirmation"
+                                class="w-full pl-10 pr-10 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#86662c] focus:border-transparent outline-none"
+                                required>
+                            <button type="button"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-[#86662c]"
+                                onclick="togglePassword('new_password_confirmation', 'toggleConfirmIcon')">
+                                <i class="fa-regular fa-eye" id="toggleConfirmIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-end space-x-3 pt-2">
+                        <button type="reset"
+                            class="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                            Clear
+                        </button>
+                        <button type="submit"
+                            class="px-6 py-2.5 bg-[#86662c] text-white rounded-lg hover:bg-[#6b4f23] transition-colors">
+                            Update Password
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 @endsection

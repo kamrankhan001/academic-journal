@@ -166,10 +166,10 @@
 
                 <!-- Notifications -->
                 <li>
-                    <a href="#"
-                        class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-[#86662c]/10 hover:text-[#86662c] transition-colors group">
+                    <a href="{{ route('admin.notifications.index') }}"
+                        class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-[#86662c]/10 hover:text-[#86662c] transition-colors group {{ request()->routeIs('admin.notifications.*') ? 'bg-[#86662c]/10 text-[#86662c]' : '' }}">
                         <i
-                            class="fa-solid fa-bell w-5 text-gray-400 group-hover:text-[#86662c]"></i>
+                            class="fa-solid fa-bell w-5 text-gray-400 group-hover:text-[#86662c] {{ request()->routeIs('admin.notifications.*') ? 'text-[#86662c]' : '' }}"></i>
                         <span class="ml-3 text-sm font-medium">Notifications</span>
                     </a>
                 </li>

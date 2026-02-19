@@ -5,6 +5,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const topbarElement = document.querySelector('[data-home-route]');
     const homeRoute = topbarElement?.dataset.homeRoute || '/';
     
+    // Journal route for search
+    const journalRoute = '/journals'; // or use route('journals') if passed from Blade
+    
     // Desktop Search Toggle with smooth transition
     const desktopToggle = document.getElementById('desktopSearchToggle');
     const desktopSearchContainer = document.getElementById('desktopSearchContainer');
@@ -93,12 +96,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Handle clear search buttons - using class selector
+    // Handle clear search buttons - redirect to journals page without search query
     const clearButtons = document.querySelectorAll('.clear-search');
     clearButtons.forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
-            window.location.href = homeRoute;
+            // Redirect to journals page without search parameter
+            window.location.href = journalRoute;
         });
     });
 

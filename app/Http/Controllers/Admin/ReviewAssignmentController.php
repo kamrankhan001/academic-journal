@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Journal;
 use App\Models\Reviewer;
 use App\Models\JournalReviewAssignment;
+use App\Notifications\ReviewerAssignmentNotification;
+use App\Notifications\ReviewerReminderNotification;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Http\Request;
 
 class ReviewAssignmentController extends Controller
@@ -135,8 +138,8 @@ class ReviewAssignmentController extends Controller
 
                 $assignments[] = $assignment;
 
-                // TODO: Send email notification to reviewer
-                $this->sendAssignmentEmail($assignment);
+                // Send email notification to reviewer
+                 $assignment->reviewer->user->notify(new ReviewerAssignmentNotification($assignment));
             }
         }
 
@@ -172,8 +175,8 @@ class ReviewAssignmentController extends Controller
         // Update reminder timestamp
         $assignment->update(['reminder_sent_at' => now()]);
 
-        // TODO: Send reminder email
-        $this->sendReminderEmail($assignment);
+        // Send reminder email
+         $assignment->reviewer->user->notify(new ReviewerReminderNotification($assignment));
 
         return redirect()->back()
             ->with('success', 'Reminder sent successfully to ' . $assignment->reviewer->user->name);
@@ -195,20 +198,4 @@ class ReviewAssignmentController extends Controller
             ->with('success', 'Assignment deleted successfully.');
     }
 
-    /**
-     * Send assignment email to reviewer.
-     */
-    private function sendAssignmentEmail(JournalReviewAssignment $assignment)
-    {
-        // TODO: Implement email sending
-        // This would typically use Mail::send() or a notification
-    }
-
-    /**
-     * Send reminder email to reviewer.
-     */
-    private function sendReminderEmail(JournalReviewAssignment $assignment)
-    {
-        // TODO: Implement reminder email
-    }
 }

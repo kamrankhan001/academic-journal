@@ -8,23 +8,26 @@ use App\Http\Controllers\NewsletterController;
 Route::redirect('/', '/home');
 
 Route::controller(GeneralJournalController::class)->group(function () {
-    Route::get('/journals',     'index')->name('journals');
-    Route::get('/archives',     'archives')->name('archives');
+    Route::get('/journals', 'index')->name('journals');
+    Route::get('/archives', 'archives')->name('archives');
     Route::get('/journal/{slug}', 'showJournal')->name('journal.show');
-    });
+});
 
 Route::controller(PageController::class)->group(function () {
     Route::get('/home', 'home')->name('home');
     Route::get('/about', 'about')->name('about');
     Route::get('/contact', 'contact')->name('contact');
 
-    Route::get('/current-issue', 'currentIssue')->name('current-issue');
     Route::get('/announcements', 'announcements')->name('announcements');
     Route::get('/authors-guidelines', 'guidelines')->name('guidelines');
     Route::get('/editorial-policies', 'editorialPolicy')->name('editorial-policy');
     Route::get('/journal-policies', 'journalPolicies')->name('journal-policies');
     Route::get('/reviewers', 'reviewers')->name('reviewers');
     Route::get('/editorial-team', 'editorialTeam')->name('editorial-team');
+
+    Route::get('/issues', 'issues')->name('issues');
+    Route::get('/issues/{id}','issueShow')->name('issue.show');
+    Route::get('/current-issue','currentIssue')->name('current-issue');
 
 
 

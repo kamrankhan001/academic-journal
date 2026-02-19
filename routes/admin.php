@@ -18,14 +18,14 @@ use App\Http\Controllers\Admin\NotificationController as AdminNotificationContro
 ######################################################################################
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
-    
+
     // Dashboard
     Route::controller(AdminDashboardController::class)->group(function () {
         Route::get('/', 'index')->name('dashboard');
         Route::get('/chart-data', 'getChartData')->name('chart-data');
         Route::get('/quick-stats', 'getQuickStats')->name('quick-stats');
     });
-    
+
     // Journals Management
     Route::prefix('journals')->name('journals.')->controller(AdminJournalsController::class)->group(function () {
         Route::get('/', 'index')->name('index');
@@ -38,7 +38,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::post('/{id}/reject', 'reject')->name('reject');
         Route::delete('/{id}', 'destroy')->name('destroy');
     });
-    
+
     // Users Management
     Route::prefix('users')->name('users.')->controller(AdminUsersController::class)->group(function () {
         Route::get('/', 'index')->name('index');
@@ -52,7 +52,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::post('/{id}/verify-email', 'verifyEmail')->name('verify-email');
         Route::post('/{id}/toggle-role', 'toggleRole')->name('toggle-role');
     });
-    
+
     // Tags / Categories Management
     Route::prefix('tags')->name('tags.')->controller(AdminTagsController::class)->group(function () {
         Route::get('/', 'index')->name('index');
@@ -65,19 +65,19 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::post('/bulk-delete', 'bulkDestroy')->name('bulk-destroy');
         Route::post('/merge', 'merge')->name('merge');
     });
-    
+
     Route::resource('volumes', VolumeController::class);
     Route::post('volumes/{volume}/publish', [VolumeController::class, 'publish'])->name('volumes.publish');
-    
+
     // Issue Management
     Route::resource('issues', IssueController::class);
     Route::get('volumes/{volume}/issues/create', [IssueController::class, 'createForVolume'])->name('issues.create-for-volume');
     Route::post('issues/{issue}/publish', [IssueController::class, 'publish'])->name('issues.publish');
-    
+
     // Reviewer Management
     Route::resource('reviewers', ReviewerController::class);
     Route::post('reviewers/{reviewer}/toggle-status', [ReviewerController::class, 'toggleStatus'])->name('reviewers.toggle-status');
-    
+
     // Review Assignments
     Route::controller(ReviewAssignmentController::class)->group(function () {
         Route::get('journals/{journal}/assign-reviewers', 'create')->name('assign-reviewers.create');
@@ -101,12 +101,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::post('/{id}/duplicate', 'duplicate')->name('duplicate');
         Route::post('/preview', 'preview')->name('preview');
     });
-    
+
     // Profile Routes
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
 
-    Route::get('/notifications', [AdminNotificationController::class, 'index'])->name('notifications');
-    Route::get('/notifications/create-announcement', [AdminNotificationController::class, 'createAnnouncement'])->name('notifications.create-announcement');
-    Route::post('/notifications/send-announcement', [AdminNotificationController::class, 'sendAnnouncement'])->name('notifications.send-announcement');
-    Route::post('/notifications/mark-all-read', [AdminNotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
+    Route::prefix('notifications')->name('notifications.')->controller(AdminNotificationController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('/mark-all-read', 'markAllRead')->name('mark-all-read');
+        Route::post('/{id}/mark-as-read', 'markAsRead')->name('notifications.mark-as-read');
+        Route::delete('/{id}', 'destroy')->name('notifications.destroy');
+        Route::get('/unread-count', 'unreadCount')->name('notifications.unread-count');
+    });
 });

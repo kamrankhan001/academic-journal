@@ -106,7 +106,7 @@
                             <h4 class="font-semibold text-gray-800 text-sm">Address</h4>
                             <p class="text-sm text-gray-600 leading-relaxed">
                                 Office No. A.2, Medizone<br>
-                                Medicine Company, Backside Al-Shifa Medical Centre<br>
+                                Medicine Company,<br>
                                 Dabgari Garden, Peshawar, Pakistan
                             </p>
                         </div>

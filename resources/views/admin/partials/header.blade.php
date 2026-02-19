@@ -45,27 +45,29 @@
                             @php
                                 $data = $notification->data;
                                 $isUnread = is_null($notification->read_at);
+                                $actionUrl = $data['action_url'] ?? '#';
                             @endphp
-                            <a href="{{ $data['action_url'] ?? '#' }}"
-                                class="block p-3 hover:bg-gray-50 border-b border-gray-100 notification-item {{ $isUnread ? 'bg-blue-50/50' : '' }}"
-                                data-id="{{ $notification->id }}">
+                            <a href="{{ $actionUrl }}" 
+                               class="block p-3 hover:bg-gray-50 border-b border-gray-100 notification-item {{ $isUnread ? 'bg-blue-50/50' : '' }}"
+                               data-id="{{ $notification->id }}"
+                               onclick="handleNotificationClick(event, '{{ $notification->id }}')">
                                 <p class="text-sm font-medium text-gray-800">
-                                    {{ $data['type'] === 'announcement' ? ($data['title'] ?? 'Announcement') : ucwords(str_replace('_', ' ', $data['type'] ?? 'notification')) }}
+                                    {{ $data['title'] ?? (isset($data['type']) && $data['type'] === 'announcement' ? 'Announcement' : ucwords(str_replace('_', ' ', $data['type'] ?? 'notification'))) }}
                                 </p>
-                                <p class="text-xs text-gray-600 mt-1 line-clamp-2">{{ $data['message'] ?? 'No message' }}
-                                </p>
+                                <p class="text-xs text-gray-600 mt-1 line-clamp-2">{{ $data['message'] ?? 'No message' }}</p>
                                 <p class="text-xs text-gray-400 mt-1">{{ $notification->created_at->diffForHumans() }}</p>
                             </a>
                         @empty
                             <div class="p-6 text-center">
+                                <i class="fa-regular fa-bell-slash text-2xl text-gray-300 mb-2"></i>
                                 <p class="text-sm text-gray-500">No notifications</p>
                             </div>
                         @endforelse
                     </div>
 
                     <div class="p-3 border-t border-gray-200 text-center">
-                        <a href="{{ route('admin.notifications') }}"
-                            class="text-xs text-[#86662c] hover:text-[#6b4f23]">
+                        <a href="{{ route('admin.notifications.index') }}"
+                            class="text-xs text-[#86662c] hover:text-[#6b4f23] font-medium">
                             View All Notifications
                         </a>
                     </div>
@@ -141,89 +143,188 @@
     }
 
     // Close dropdowns when clicking outside
-    document.addEventListener('click', function (event) {
+    document.addEventListener('click', function(event) {
         const notificationsDropdown = document.getElementById('notificationsDropdown');
         const userDropdown = document.getElementById('userDropdown');
         const notificationsMenu = document.getElementById('notificationsMenu');
         const userMenu = document.getElementById('userMenu');
 
         if (notificationsDropdown && !notificationsDropdown.contains(event.target)) {
-            if (notificationsMenu) {
+            if (notificationsMenu && !notificationsMenu.classList.contains('hidden')) {
                 notificationsMenu.classList.add('hidden');
             }
         }
 
         if (userDropdown && !userDropdown.contains(event.target)) {
-            if (userMenu) {
+            if (userMenu && !userMenu.classList.contains('hidden')) {
                 userMenu.classList.add('hidden');
             }
         }
     });
 
-    // Notification functions
+    // Handle notification click
+    function handleNotificationClick(event, notificationId) {
+        // Mark as read when clicked
+        markAsRead(notificationId);
+        
+        // Don't prevent default - let the link work
+        // But we want to keep the dropdown open until navigation
+        event.stopPropagation();
+    }
+
+    // Mark single notification as read
     function markAsRead(notificationId) {
         fetch(`/admin/notifications/${notificationId}/mark-as-read`, {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
                 'Content-Type': 'application/json',
+                'Accept': 'application/json'
             },
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const notificationItem = document.querySelector(`.notification-item[data-id="${notificationId}"]`);
-                    if (notificationItem) {
-                        notificationItem.classList.remove('bg-blue-50/50');
-                    }
-                    updateNotificationCount();
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Update UI
+                const notificationItem = document.querySelector(`.notification-item[data-id="${notificationId}"]`);
+                if (notificationItem) {
+                    notificationItem.classList.remove('bg-blue-50/50');
                 }
-            });
+                
+                // Update notification count
+                updateNotificationCount();
+                
+                // Show success toast if available
+                if (window.toast) {
+                    toast.success('Notification marked as read');
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error marking notification as read:', error);
+        });
     }
 
+    // Mark all notifications as read
     function markAllAsRead() {
         fetch('{{ route("admin.notifications.mark-all-read") }}', {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
                 'Content-Type': 'application/json',
+                'Accept': 'application/json'
             },
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.querySelectorAll('.notification-item').forEach(item => {
-                        item.classList.remove('bg-blue-50/50');
-                    });
-                    updateNotificationCount();
-                    const markAllBtn = document.querySelector('#notificationsMenu button[onclick="markAllAsRead()"]');
-                    if (markAllBtn) {
-                        markAllBtn.remove();
-                    }
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Update UI
+                document.querySelectorAll('.notification-item').forEach(item => {
+                    item.classList.remove('bg-blue-50/50');
+                });
+                
+                // Remove mark all button
+                const markAllBtn = document.querySelector('#notificationsMenu button[onclick="markAllAsRead()"]');
+                if (markAllBtn) {
+                    markAllBtn.remove();
                 }
-            });
+                
+                // Update notification count
+                updateNotificationCount();
+                
+                // Show success toast if available
+                if (window.toast) {
+                    toast.success('All notifications marked as read');
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error marking all notifications as read:', error);
+            if (window.toast) {
+                toast.error('Failed to mark all as read');
+            }
+        });
     }
 
+    // Update notification count badge
     function updateNotificationCount() {
         fetch('/admin/notifications/unread-count', {
             method: 'GET',
             headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
                 'Content-Type': 'application/json',
+                'Accept': 'application/json'
             },
         })
-            .then(response => response.json())
-            .then(data => {
-                const badge = document.getElementById('notificationBadge');
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const badge = document.getElementById('notificationBadge');
+            if (badge) {
                 if (data.count > 0) {
                     badge.textContent = data.count > 9 ? '9+' : data.count;
                     badge.classList.remove('hidden');
                 } else {
                     badge.classList.add('hidden');
                 }
-            });
+            }
+        })
+        .catch(error => {
+            console.error('Error updating notification count:', error);
+        });
     }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initial notification count
+        updateNotificationCount();
+        
+        // Add click handlers to notification items
+        document.querySelectorAll('.notification-item').forEach(item => {
+            const notificationId = item.dataset.id;
+            if (notificationId && !item.hasAttribute('data-handler-attached')) {
+                item.setAttribute('data-handler-attached', 'true');
+            }
+        });
+    });
 
     // Poll for new notifications every 60 seconds
     setInterval(updateNotificationCount, 60000);
+
+    // Optional: Show new notification toast when count increases
+    let previousCount = {{ $unreadCount }};
+    setInterval(function() {
+        fetch('/admin/notifications/unread-count', {
+            method: 'GET',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.count > previousCount && window.toast) {
+                toast.info('You have new notifications');
+            }
+            previousCount = data.count;
+        })
+        .catch(error => {
+            console.error('Error checking for new notifications:', error);
+        });
+    }, 30000); // Check every 30 seconds
 </script>

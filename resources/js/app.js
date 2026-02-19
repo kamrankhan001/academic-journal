@@ -2,6 +2,7 @@ import './bootstrap';
 import './topbar';
 import './nav';
 import { initDashboard } from './dashboard';
+import toast from './toast';
 
 // Initialize dashboard functionality when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
@@ -10,3 +11,6 @@ document.addEventListener('DOMContentLoaded', function() {
         initDashboard();
     }
 });
+
+// Make toast available globally
+window.toast = toast;

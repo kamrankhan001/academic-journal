@@ -126,12 +126,12 @@
                             @if($assignment->status === 'pending')
                                 <a href="{{ route('reviewer.assignments.show', $assignment) }}" 
                                    class="ml-4 text-sm text-[#86662c] hover:text-[#6b4f23]">
-                                    Respond <i class="fa-regular fa-arrow-right ml-1"></i>
+                                    Respond <i class="fa-solid fa-arrow-right ml-1"></i>
                                 </a>
                             @elseif(in_array($assignment->status, ['accepted', 'in_progress']))
                                 <a href="{{ route('reviewer.assignments.review', $assignment) }}" 
                                    class="ml-4 text-sm text-[#86662c] hover:text-[#6b4f23]">
-                                    Continue <i class="fa-regular fa-arrow-right ml-1"></i>
+                                    Continue <i class="fa-solid fa-arrow-right ml-1"></i>
                                 </a>
                             @endif
                         </div>
@@ -146,7 +146,7 @@
             <div class="p-4 bg-gray-50 border-t border-gray-200">
                 <a href="{{ route('reviewer.assignments.index') }}" 
                    class="text-sm text-[#86662c] hover:text-[#6b4f23] flex items-center justify-center">
-                    View All Assignments
+                    View All Assignments <i class="fa-solid fa-arrow-right ml-1"></i>
                 </a>
             </div>
         </div>

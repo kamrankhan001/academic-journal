@@ -69,7 +69,7 @@
                     </div>
 
                     <div class="p-3 border-t border-gray-200 text-center">
-                        <a href="{{ route('reviewer.notifications') }}"
+                        <a href="{{ route('reviewer.notifications.index') }}"
                             class="text-xs text-[#86662c] hover:text-[#6b4f23]">
                             View All Notifications
                         </a>

@@ -22,8 +22,8 @@
                 </a>
             </div>
 
-            <!-- Search - Below social icons on mobile -->
-            <form action="{{ route('home') }}" method="GET" class="w-full">
+            <!-- Search - Below social icons on mobile - UPDATE THIS FORM ACTION -->
+            <form action="{{ route('journals') }}" method="GET" class="w-full">
                 <div class="relative">
                     <input type="text" 
                            name="search"
@@ -32,7 +32,7 @@
                            class="w-full pl-10 pr-4 py-2 text-sm bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent rounded-lg">
                     <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 text-sm"></i>
                     @if(request('search'))
-                        <a href="{{ route('home') }}" 
+                        <a href="{{ route('journals') }}" 
                            class="clear-search absolute right-3 top-1/2 transform -translate-y-1/2 text-white/60 hover:text-white">
                             <i class="fa-solid fa-xmark"></i>
                         </a>
@@ -50,9 +50,9 @@
                     <i class="fa-solid fa-search"></i>
                 </button>
 
-                <!-- Search Input for Desktop with smooth transition -->
+                <!-- Search Input for Desktop with smooth transition - UPDATE THIS FORM ACTION -->
                 <div id="desktopSearchContainer" class="w-0 opacity-0 overflow-hidden transition-all duration-300 ease-in-out">
-                    <form action="{{ route('home') }}" method="GET" id="desktopSearchForm">
+                    <form action="{{ route('journals') }}" method="GET" id="desktopSearchForm">
                         <div class="relative w-64">
                             <input type="text" 
                                    name="search"
@@ -62,7 +62,7 @@
                                    class="w-full pl-9 pr-8 py-1.5 text-sm bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent">
                             <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 text-sm"></i>
                             @if(request('search'))
-                                <a href="{{ route('home') }}" 
+                                <a href="{{ route('journals') }}" 
                                    class="clear-search absolute right-3 top-1/2 transform -translate-y-1/2 text-white/60 hover:text-white">
                                     <i class="fa-solid fa-xmark"></i>
                                 </a>

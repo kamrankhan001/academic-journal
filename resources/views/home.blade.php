@@ -40,19 +40,19 @@
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                 <div>
-                    <div class="text-2xl font-bold text-[#86662c]">500+</div>
+                    <div class="text-2xl font-bold text-[#86662c]">{{ $stats['articles'] }}+</div>
                     <div class="text-sm text-gray-600">Published Articles</div>
                 </div>
                 <div>
-                    <div class="text-2xl font-bold text-[#86662c]">2,500+</div>
+                    <div class="text-2xl font-bold text-[#86662c]">{{ $stats['authors'] }}+</div>
                     <div class="text-sm text-gray-600">Registered Authors</div>
                 </div>
                 <div>
-                    <div class="text-2xl font-bold text-[#86662c]">150+</div>
-                    <div class="text-sm text-gray-600">Reviewers</div>
+                    <div class="text-2xl font-bold text-[#86662c]">{{ $stats['reviewers'] }}+</div>
+                    <div class="text-sm text-gray-600">Active Reviewers</div>
                 </div>
                 <div>
-                    <div class="text-2xl font-bold text-[#86662c]">50+</div>
+                    <div class="text-2xl font-bold text-[#86662c]">{{ $stats['countries'] }}+</div>
                     <div class="text-sm text-gray-600">Countries</div>
                 </div>
             </div>
@@ -72,169 +72,80 @@
             </a>
         </div>
 
-        <!-- Latest 3 Journals (Static) -->
+        <!-- Latest Journals from Database -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Journal Card 1 -->
-            <article class="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
-                <div class="p-6">
-                    <div class="flex justify-between items-start mb-3">
-                        <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
-                            Research Article
-                        </span>
-                        <span class="text-xs text-gray-500">
-                            <i class="fa-regular fa-calendar mr-1"></i>
-                            Mar 15, 2024
-                        </span>
-                    </div>
-                    
-                    <h3 class="text-lg font-bold text-gray-800 mb-2 hover:text-[#86662c] line-clamp-2">
-                        <a href="#">Advances in Minimally Invasive Cardiac Surgery: A Systematic Review</a>
-                    </h3>
-                    
-                    <div class="flex items-center mb-3">
-                        <div class="flex -space-x-2">
-                            <img src="https://ui-avatars.com/api/?name=John+Smith&background=86662c&color=fff&size=28" 
-                                 class="w-7 h-7 rounded-full border-2 border-white"
-                                 alt="Author">
-                            <img src="https://ui-avatars.com/api/?name=Sarah+Johnson&background=6b7280&color=fff&size=28" 
-                                 class="w-7 h-7 rounded-full border-2 border-white"
-                                 alt="Co-author">
-                            <img src="https://ui-avatars.com/api/?name=Michael+Chen&background=6b7280&color=fff&size=28" 
-                                 class="w-7 h-7 rounded-full border-2 border-white"
-                                 alt="Co-author">
+            @forelse($latestJournals as $journal)
+                <article class="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-3">
+                            @if($journal->tags->isNotEmpty())
+                                <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+                                    {{ $journal->tags->first()->name }}
+                                </span>
+                            @else
+                                <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full">
+                                    Research Article
+                                </span>
+                            @endif
+                            <span class="text-xs text-gray-500">
+                                <i class="fa-regular fa-calendar mr-1"></i>
+                                {{ $journal->published_at ? $journal->published_at->format('M d, Y') : $journal->created_at->format('M d, Y') }}
+                            </span>
                         </div>
-                        <span class="text-xs text-gray-600 ml-2 line-clamp-1">
-                            John Smith et al.
-                        </span>
-                    </div>
-                    
-                    <p class="text-sm text-gray-600 mb-4 line-clamp-2">
-                        This systematic review evaluates recent advances in minimally invasive cardiac surgical techniques, comparing outcomes with traditional approaches...
-                    </p>
-                    
-                    <div class="flex flex-wrap gap-1 mb-4">
-                        <span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">Cardiac Surgery</span>
-                        <span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">Minimally Invasive</span>
-                        <span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">Review</span>
-                    </div>
-                    
-                    <div class="flex items-center justify-between pt-3 border-t border-gray-100">
-                        <div class="flex items-center space-x-3 text-xs text-gray-500">
-                            <span><i class="fa-regular fa-eye mr-1"></i>1,234</span>
-                            <span class="text-green-600"><i class="fa-regular fa-file-pdf mr-1"></i>PDF</span>
+                        
+                        <h3 class="text-lg font-bold text-gray-800 mb-2 hover:text-[#86662c] line-clamp-2">
+                            <a href="{{ route('journal.show', $journal->slug) }}">{{ $journal->title }}</a>
+                        </h3>
+                        
+                        <div class="flex items-center mb-3">
+                            <div class="flex -space-x-2">
+                                <img src="https://ui-avatars.com/api/?name={{ urlencode($journal->author->name) }}&background=86662c&color=fff&size=28" 
+                                     class="w-7 h-7 rounded-full border-2 border-white"
+                                     alt="{{ $journal->author->name }}">
+                                @foreach($journal->coAuthors->take(2) as $coAuthor)
+                                    <img src="https://ui-avatars.com/api/?name={{ urlencode($coAuthor->name) }}&background=6b7280&color=fff&size=28" 
+                                         class="w-7 h-7 rounded-full border-2 border-white"
+                                         alt="{{ $coAuthor->name }}">
+                                @endforeach
+                            </div>
+                            <span class="text-xs text-gray-600 ml-2 line-clamp-1">
+                                {{ $journal->author->name }} et al.
+                            </span>
                         </div>
-                        <a href="#" class="text-[#86662c] hover:text-[#6b4f23] text-sm font-medium">
-                            Read More <i class="fa-solid fa-arrow-right ml-1 text-xs"></i>
-                        </a>
+                        
+                        <p class="text-sm text-gray-600 mb-4 line-clamp-2">
+                            {{ $journal->abstract ?? Str::limit(strip_tags($journal->content), 150) }}
+                        </p>
+                        
+                        @if($journal->tags->count() > 0)
+                            <div class="flex flex-wrap gap-1 mb-4">
+                                @foreach($journal->tags->take(3) as $tag)
+                                    <span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">{{ $tag->name }}</span>
+                                @endforeach
+                            </div>
+                        @endif
+                        
+                        <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                            <div class="flex items-center space-x-3 text-xs text-gray-500">
+                                <span><i class="fa-regular fa-eye mr-1"></i>{{ number_format($journal->views_count) }}</span>
+                                @if($journal->manuscript)
+                                    <a href="{{ $journal->manuscript_url }}" target="_blank" class="text-green-600 hover:text-green-700">
+                                        <i class="fa-regular fa-file-pdf mr-1"></i>PDF
+                                    </a>
+                                @endif
+                            </div>
+                            <a href="{{ route('journal.show', $journal->slug) }}" class="text-[#86662c] hover:text-[#6b4f23] text-sm font-medium">
+                                Read More <i class="fa-solid fa-arrow-right ml-1 text-xs"></i>
+                            </a>
+                        </div>
                     </div>
+                </article>
+            @empty
+                <!-- Fallback static content if no journals exist -->
+                <div class="col-span-3 text-center py-12">
+                    <p class="text-gray-500">No published journals yet. Check back soon!</p>
                 </div>
-            </article>
-
-            <!-- Journal Card 2 -->
-            <article class="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
-                <div class="p-6">
-                    <div class="flex justify-between items-start mb-3">
-                        <span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
-                            Original Research
-                        </span>
-                        <span class="text-xs text-gray-500">
-                            <i class="fa-regular fa-calendar mr-1"></i>
-                            Mar 10, 2024
-                        </span>
-                    </div>
-                    
-                    <h3 class="text-lg font-bold text-gray-800 mb-2 hover:text-[#86662c] line-clamp-2">
-                        <a href="#">Postoperative Outcomes in Elderly Patients Undergoing Hip Arthroplasty</a>
-                    </h3>
-                    
-                    <div class="flex items-center mb-3">
-                        <div class="flex -space-x-2">
-                            <img src="https://ui-avatars.com/api/?name=Emily+Williams&background=86662c&color=fff&size=28" 
-                                 class="w-7 h-7 rounded-full border-2 border-white"
-                                 alt="Author">
-                            <img src="https://ui-avatars.com/api/?name=David+Brown&background=6b7280&color=fff&size=28" 
-                                 class="w-7 h-7 rounded-full border-2 border-white"
-                                 alt="Co-author">
-                        </div>
-                        <span class="text-xs text-gray-600 ml-2 line-clamp-1">
-                            Emily Williams et al.
-                        </span>
-                    </div>
-                    
-                    <p class="text-sm text-gray-600 mb-4 line-clamp-2">
-                        A retrospective cohort study examining complications, recovery time, and functional outcomes in patients over 75 years undergoing hip replacement...
-                    </p>
-                    
-                    <div class="flex flex-wrap gap-1 mb-4">
-                        <span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">Orthopedics</span>
-                        <span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">Geriatrics</span>
-                        <span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">Arthroplasty</span>
-                    </div>
-                    
-                    <div class="flex items-center justify-between pt-3 border-t border-gray-100">
-                        <div class="flex items-center space-x-3 text-xs text-gray-500">
-                            <span><i class="fa-regular fa-eye mr-1"></i>892</span>
-                            <span class="text-green-600"><i class="fa-regular fa-file-pdf mr-1"></i>PDF</span>
-                        </div>
-                        <a href="#" class="text-[#86662c] hover:text-[#6b4f23] text-sm font-medium">
-                            Read More <i class="fa-solid fa-arrow-right ml-1 text-xs"></i>
-                        </a>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Journal Card 3 -->
-            <article class="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
-                <div class="p-6">
-                    <div class="flex justify-between items-start mb-3">
-                        <span class="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
-                            Case Report
-                        </span>
-                        <span class="text-xs text-gray-500">
-                            <i class="fa-regular fa-calendar mr-1"></i>
-                            Mar 5, 2024
-                        </span>
-                    </div>
-                    
-                    <h3 class="text-lg font-bold text-gray-800 mb-2 hover:text-[#86662c] line-clamp-2">
-                        <a href="#">Rare Presentation of Mediastinal Mass: A Case Report and Literature Review</a>
-                    </h3>
-                    
-                    <div class="flex items-center mb-3">
-                        <div class="flex -space-x-2">
-                            <img src="https://ui-avatars.com/api/?name=Robert+Martinez&background=86662c&color=fff&size=28" 
-                                 class="w-7 h-7 rounded-full border-2 border-white"
-                                 alt="Author">
-                            <img src="https://ui-avatars.com/api/?name=Lisa+Wong&background=6b7280&color=fff&size=28" 
-                                 class="w-7 h-7 rounded-full border-2 border-white"
-                                 alt="Co-author">
-                        </div>
-                        <span class="text-xs text-gray-600 ml-2 line-clamp-1">
-                            Robert Martinez et al.
-                        </span>
-                    </div>
-                    
-                    <p class="text-sm text-gray-600 mb-4 line-clamp-2">
-                        We report a rare case of mediastinal mass with atypical presentation, discussing diagnostic challenges and management strategies...
-                    </p>
-                    
-                    <div class="flex flex-wrap gap-1 mb-4">
-                        <span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">Cardiothoracic</span>
-                        <span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">Case Report</span>
-                        <span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">Rare Disease</span>
-                    </div>
-                    
-                    <div class="flex items-center justify-between pt-3 border-t border-gray-100">
-                        <div class="flex items-center space-x-3 text-xs text-gray-500">
-                            <span><i class="fa-regular fa-eye mr-1"></i>567</span>
-                            <span class="text-green-600"><i class="fa-regular fa-file-pdf mr-1"></i>PDF</span>
-                        </div>
-                        <a href="#" class="text-[#86662c] hover:text-[#6b4f23] text-sm font-medium">
-                            Read More <i class="fa-solid fa-arrow-right ml-1 text-xs"></i>
-                        </a>
-                    </div>
-                </div>
-            </article>
+            @endforelse
         </div>
     </div>
 
@@ -331,7 +242,7 @@
         </div>
     </div>
 
-    <!-- Journal Resources Section - Full Viewport Height -->
+    <!-- Journal Resources Section -->
     <div class="relative min-h-screen bg-linear-to-br from-gray-50 to-white py-16 overflow-hidden">
         <!-- Decorative Background Elements -->
         <div class="absolute top-0 left-0 w-64 h-64 bg-[#86662c]/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
@@ -351,7 +262,7 @@
                 <!-- Main Content Grid -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
                     
-                    <!-- Left Column - Issues Showcase (Creative Timeline Style) -->
+                    <!-- Left Column - Issues Showcase -->
                     <div class="space-y-8">
                         <div class="flex items-center gap-3 mb-8">
                             <div class="w-12 h-12 bg-[#86662c] rounded-2xl flex items-center justify-center text-white shadow-lg shadow-[#86662c]/20">
@@ -363,101 +274,62 @@
                             </div>
                         </div>
 
-                        <!-- Interactive Timeline -->
+                        <!-- Interactive Timeline with Dynamic Issues -->
                         <div class="relative">
                             <!-- Timeline Line -->
                             <div class="absolute left-6 top-0 bottom-0 w-0.5 bg-linear-to-b from-[#86662c] via-[#86662c]/50 to-transparent"></div>
                             
                             <!-- Issue Items -->
                             <div class="space-y-6 relative">
-                                <!-- Issue 1 - Current -->
-                                <div class="group relative flex items-start gap-6 pl-14">
-                                    <div class="absolute left-0 w-12 h-12 bg-[#86662c] rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300 z-10">
-                                        <i class="fa-solid fa-book-open text-lg"></i>
-                                    </div>
-                                    <div class="flex-1 bg-white rounded-2xl p-6 border border-gray-200 hover:shadow-xl transition-all duration-300 group-hover:translate-x-2">
-                                        <div class="flex items-center justify-between mb-3">
-                                            <span class="px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
-                                                <i class="fa-solid fa-fire mr-1"></i>Current Issue
-                                            </span>
-                                            <span class="text-sm text-gray-500">
-                                                <i class="fa-regular fa-calendar mr-1"></i>June 2024
-                                            </span>
+                                @forelse($recentIssues as $index => $issue)
+                                    <div class="group relative flex items-start gap-6 pl-14">
+                                        <div class="absolute left-0 w-12 h-12 {{ $index === 0 ? 'bg-[#86662c]' : 'bg-gray-200 group-hover:bg-[#86662c]' }} rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-all duration-300 z-10">
+                                            <i class="fa-solid fa-book-open text-lg"></i>
                                         </div>
-                                        <h4 class="text-xl font-bold text-gray-800 mb-2">Volume 2, Issue 1</h4>
-                                        <p class="text-gray-600 mb-4">Featuring groundbreaking research in minimally invasive surgery and postoperative care.</p>
-                                        <div class="flex items-center justify-between">
-                                            <span class="text-sm text-gray-500">
-                                                <i class="fa-regular fa-file-lines mr-1"></i>15 articles
-                                            </span>
-                                            <a href="#" class="text-[#86662c] hover:text-[#6b4f23] font-medium inline-flex items-center group/link">
-                                                Browse Issue 
-                                                <i class="fa-solid fa-arrow-right ml-2 group-hover/link:translate-x-1 transition-transform"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Issue 2 -->
-                                <div class="group relative flex items-start gap-6 pl-14">
-                                    <div class="absolute left-0 w-12 h-12 bg-gray-200 rounded-2xl flex items-center justify-center text-gray-600 group-hover:bg-[#86662c] group-hover:text-white transition-all duration-300 z-10">
-                                        <i class="fa-solid fa-book-open text-lg"></i>
-                                    </div>
-                                    <div class="flex-1 bg-white rounded-2xl p-6 border border-gray-200 hover:shadow-xl transition-all duration-300 group-hover:translate-x-2">
-                                        <div class="flex items-center justify-between mb-3">
-                                            <span class="text-sm text-gray-500">
-                                                <i class="fa-regular fa-calendar mr-1"></i>March 2024
-                                            </span>
-                                        </div>
-                                        <h4 class="text-xl font-bold text-gray-800 mb-2">Volume 1, Issue 2</h4>
-                                        <p class="text-gray-600 mb-4">Special collection on orthopedic innovations and rehabilitation techniques.</p>
-                                        <div class="flex items-center justify-between">
-                                            <span class="text-sm text-gray-500">
-                                                <i class="fa-regular fa-file-lines mr-1"></i>12 articles
-                                            </span>
-                                            <a href="#" class="text-[#86662c] hover:text-[#6b4f23] font-medium inline-flex items-center group/link">
-                                                Browse Issue 
-                                                <i class="fa-solid fa-arrow-right ml-2 group-hover/link:translate-x-1 transition-transform"></i>
-                                            </a>
+                                        <div class="flex-1 bg-white rounded-2xl p-6 border border-gray-200 hover:shadow-xl transition-all duration-300 group-hover:translate-x-2">
+                                            <div class="flex items-center justify-between mb-3">
+                                                @if($index === 0)
+                                                    <span class="px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+                                                        <i class="fa-solid fa-fire mr-1"></i>Current Issue
+                                                    </span>
+                                                @endif
+                                                <span class="text-sm text-gray-500 {{ $index === 0 ? '' : 'ml-auto' }}">
+                                                    <i class="fa-regular fa-calendar mr-1"></i>
+                                                    {{ $issue->publication_date ? $issue->publication_date->format('F Y') : $issue->created_at->format('F Y') }}
+                                                </span>
+                                            </div>
+                                            <h4 class="text-xl font-bold text-gray-800 mb-2">
+                                                Volume {{ $issue->volume->volume_number ?? 'N/A' }}, Issue {{ $issue->issue_number }}
+                                            </h4>
+                                            <p class="text-gray-600 mb-4">{{ $issue->title }}</p>
+                                            <div class="flex items-center justify-between">
+                                                <span class="text-sm text-gray-500">
+                                                    <i class="fa-regular fa-file-lines mr-1"></i>{{ $issue->journals_count ?? 0 }} articles
+                                                </span>
+                                                <a href="{{ route('issue.show', $issue->id) }}" class="text-[#86662c] hover:text-[#6b4f23] font-medium inline-flex items-center group/link">
+                                                    Browse Issue 
+                                                    <i class="fa-solid fa-arrow-right ml-2 group-hover/link:translate-x-1 transition-transform"></i>
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-
-                                <!-- Issue 3 -->
-                                <div class="group relative flex items-start gap-6 pl-14">
-                                    <div class="absolute left-0 w-12 h-12 bg-gray-200 rounded-2xl flex items-center justify-center text-gray-600 group-hover:bg-[#86662c] group-hover:text-white transition-all duration-300 z-10">
-                                        <i class="fa-solid fa-book-open text-lg"></i>
+                                @empty
+                                    <div class="text-center py-12">
+                                        <p class="text-gray-500">No published issues yet. Check back soon!</p>
                                     </div>
-                                    <div class="flex-1 bg-white rounded-2xl p-6 border border-gray-200 hover:shadow-xl transition-all duration-300 group-hover:translate-x-2">
-                                        <div class="flex items-center justify-between mb-3">
-                                            <span class="text-sm text-gray-500">
-                                                <i class="fa-regular fa-calendar mr-1"></i>January 2024
-                                            </span>
-                                        </div>
-                                        <h4 class="text-xl font-bold text-gray-800 mb-2">Volume 1, Issue 1</h4>
-                                        <p class="text-gray-600 mb-4">Inaugural issue featuring diverse research from leading medical institutions.</p>
-                                        <div class="flex items-center justify-between">
-                                            <span class="text-sm text-gray-500">
-                                                <i class="fa-regular fa-file-lines mr-1"></i>10 articles
-                                            </span>
-                                            <a href="#" class="text-[#86662c] hover:text-[#6b4f23] font-medium inline-flex items-center group/link">
-                                                Browse Issue 
-                                                <i class="fa-solid fa-arrow-right ml-2 group-hover/link:translate-x-1 transition-transform"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
+                                @endforelse
                             </div>
                         </div>
 
                         <div class="mt-8 text-center">
-                            <a href="#" class="inline-flex items-center px-6 py-3 bg-[#86662c] text-white rounded-xl hover:bg-[#6b4f23] transition-all duration-300 shadow-lg hover:shadow-xl group">
+                            <a href="{{ route('issues') }}" class="inline-flex items-center px-6 py-3 bg-[#86662c] text-white rounded-xl hover:bg-[#6b4f23] transition-all duration-300 shadow-lg hover:shadow-xl group">
                                 <span>View All Issues</span>
+                                <i class="fa-solid fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
                             </a>
                         </div>
                     </div>
 
-                    <!-- Right Column - Submission Process (Card Grid) -->
+                    <!-- Right Column - Submission Process (Static) -->
                     <div class="space-y-8">
                         <div class="flex items-center gap-3 mb-8">
                             <div class="w-12 h-12 bg-[#86662c] rounded-2xl flex items-center justify-center text-white shadow-lg shadow-[#86662c]/20">
@@ -469,7 +341,7 @@
                             </div>
                         </div>
 
-                        <!-- Process Steps as Interactive Cards -->
+                        <!-- Process Steps as Interactive Cards (Static) -->
                         <div class="space-y-4">
                             <!-- Step 1 -->
                             <div class="group bg-white rounded-2xl p-6 border border-gray-200 hover:border-[#86662c] hover:shadow-xl transition-all duration-300">
@@ -579,7 +451,7 @@
                 <a href="{{ route('author.index') }}" class="px-6 py-3 bg-white text-[#86662c] rounded-lg font-semibold hover:bg-gray-100 transition-colors">
                     Submit Manuscript
                 </a>
-                <a href="#" class="px-6 py-3 bg-white/10 backdrop-blur-sm border border-white/30 text-white rounded-lg font-semibold hover:bg-white/20 transition-colors">
+                <a href="{{ route('register', ['role' => 'reviewer']) }}" class="px-6 py-3 bg-white/10 backdrop-blur-sm border border-white/30 text-white rounded-lg font-semibold hover:bg-white/20 transition-colors">
                     Become a Reviewer
                 </a>
             </div>

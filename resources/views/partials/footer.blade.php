@@ -79,7 +79,7 @@
                         <i class="fa-solid fa-location-dot mt-1 mr-3 text-[#86662c] w-4"></i>
                         <span class="text-gray-600 text-sm">
                             Office No. A.2, Medizone
-                            Medicine Company, Backside Al-Shifa Medical Centre
+                            Medicine Company,
                             Dabgari Garden, Peshawar, Pakistan
                         </span>
                     </li>

@@ -52,6 +52,7 @@ class JournalUnderReviewNotification extends Notification implements ShouldQueue
             'journal_id' => $this->journal->id,
             'journal_title' => $this->journal->title,
             'journal_slug' => $this->journal->slug,
+            'tracking_id' => $this->journal->tracking_id,
             'message' => 'Your journal "' . $this->journal->title . '" is now under review.',
             'icon' => 'fa-regular fa-clock',
             'icon_bg' => 'bg-purple-100',

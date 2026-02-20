@@ -54,6 +54,7 @@ class JournalRevisionRequiredNotification extends Notification implements Should
             'journal_id' => $this->journal->id,
             'journal_title' => $this->journal->title,
             'journal_slug' => $this->journal->slug,
+            'tracking_id' => $this->journal->tracking_id,
             'message' => 'Your journal "' . $this->journal->title . '" requires revisions.',
             'icon' => 'fa-regular fa-pen-to-square',
             'icon_bg' => 'bg-orange-100',

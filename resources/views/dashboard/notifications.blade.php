@@ -88,11 +88,11 @@
                             <div class="flex items-center space-x-3">
                                 <p class="text-xs text-gray-400">{{ $notification->created_at->diffForHumans() }}</p>
                                 
-                                @if(isset($data['action_url']))
+                                <!-- @if(isset($data['action_url']))
                                     <a href="{{ $data['action_url'] }}" class="text-xs text-[#86662c] hover:text-[#6b4f23]">
                                         View Details
                                     </a>
-                                @endif
+                                @endif -->
                             </div>
                         </div>
                     </div>

@@ -26,11 +26,13 @@ class AdminAnnouncementController extends Controller
                 $query->whereNotNull('sent_at');
             } elseif ($request->status == 'draft') {
                 $query->whereNull('sent_at');
-            } elseif ($request->status == 'scheduled') {
-                $query->whereNull('sent_at')
-                    ->whereNotNull('scheduled_at')
-                    ->where('scheduled_at', '>', now());
-            }
+            } 
+            // Commented out scheduled filter
+            // elseif ($request->status == 'scheduled') {
+            //     $query->whereNull('sent_at')
+            //         ->whereNotNull('scheduled_at')
+            //         ->where('scheduled_at', '>', now());
+            // }
         }
 
         // Search
@@ -44,15 +46,15 @@ class AdminAnnouncementController extends Controller
 
         $announcements = $query->paginate(15);
 
-        // Get stats
+        // Get stats (commented out scheduled count)
         $stats = [
             'total' => Announcement::count(),
             'sent' => Announcement::whereNotNull('sent_at')->count(),
             'draft' => Announcement::whereNull('sent_at')->count(),
-            'scheduled' => Announcement::whereNull('sent_at')
-                ->whereNotNull('scheduled_at')
-                ->where('scheduled_at', '>', now())
-                ->count(),
+            // 'scheduled' => Announcement::whereNull('sent_at')
+            //     ->whereNotNull('scheduled_at')
+            //     ->where('scheduled_at', '>', now())
+            //     ->count(),
         ];
 
         return view('admin.announcements.index', compact('announcements', 'stats'));
@@ -86,7 +88,7 @@ class AdminAnnouncementController extends Controller
             'action_text' => 'nullable|string|max:50',
             'target_roles' => 'required|array',
             'target_roles.*' => 'in:author,reviewer,admin',
-            'scheduled_at' => 'nullable|date|after:now',
+            // 'scheduled_at' => 'nullable|date|after:now', // Commented out
             'send_now' => 'boolean',
         ]);
 
@@ -104,7 +106,7 @@ class AdminAnnouncementController extends Controller
             'action_text' => $request->action_text,
             'target_roles' => in_array('all', $request->target_roles) ? null : $request->target_roles,
             'created_by' => auth()->id(),
-            'scheduled_at' => $request->scheduled_at,
+            // 'scheduled_at' => $request->scheduled_at, // Commented out
         ]);
 
         // Send immediately if requested
@@ -113,9 +115,10 @@ class AdminAnnouncementController extends Controller
             $announcement->update(['sent_at' => now()]);
             $message = 'Announcement sent successfully.';
         } else {
-            $message = $request->scheduled_at 
-                ? 'Announcement scheduled successfully.' 
-                : 'Announcement saved as draft.';
+            // $message = $request->scheduled_at 
+            //     ? 'Announcement scheduled successfully.' 
+            //     : 'Announcement saved as draft.';
+            $message = 'Announcement saved as draft.'; // Simplified message
         }
 
         return redirect()
@@ -189,7 +192,7 @@ class AdminAnnouncementController extends Controller
             'action_text' => 'nullable|string|max:50',
             'target_roles' => 'required|array',
             'target_roles.*' => 'in:author,reviewer,admin',
-            'scheduled_at' => 'nullable|date|after:now',
+            // 'scheduled_at' => 'nullable|date|after:now', // Commented out
         ]);
 
         if ($validator->fails()) {
@@ -205,7 +208,7 @@ class AdminAnnouncementController extends Controller
             'action_url' => $request->action_url,
             'action_text' => $request->action_text,
             'target_roles' => in_array('all', $request->target_roles) ? null : $request->target_roles,
-            'scheduled_at' => $request->scheduled_at,
+            // 'scheduled_at' => $request->scheduled_at, // Commented out
         ]);
 
         return redirect()
@@ -307,7 +310,7 @@ class AdminAnnouncementController extends Controller
         $newAnnouncement = $announcement->replicate();
         $newAnnouncement->title = $announcement->title . ' (Copy)';
         $newAnnouncement->sent_at = null;
-        $newAnnouncement->scheduled_at = null;
+        // $newAnnouncement->scheduled_at = null; // Commented out
         $newAnnouncement->created_by = auth()->id();
         $newAnnouncement->save();
 

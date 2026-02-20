@@ -33,9 +33,9 @@
             </a>
         </div>
 
-        <!-- Status Bar -->
+        <!-- Status Bar with Tracking ID -->
         <div class="bg-white rounded-xl shadow-soft border border-gray-200 p-4">
-            <div class="flex items-center justify-between">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div class="flex items-center space-x-4">
                     <span class="text-sm font-medium text-gray-500">Status:</span>
                     @php
@@ -53,6 +53,22 @@
                         {{ ucfirst(str_replace('_', ' ', $journal->status)) }}
                     </span>
                 </div>
+                
+                <!-- Tracking ID Display -->
+                @if($journal->tracking_id)
+                <div class="flex items-center space-x-3 bg-gray-50 px-4 py-2 rounded-lg">
+                    <div>
+                        <span class="text-xs text-gray-500">Tracking ID</span>
+                        <p class="text-sm font-mono font-medium text-gray-800">{{ $journal->tracking_id }}</p>
+                    </div>
+                    <button onclick="copyTrackingId('{{ $journal->tracking_id }}')" 
+                            class="text-[#86662c] hover:text-[#6b4f23] text-sm px-2 py-1 rounded hover:bg-gray-100 transition-colors"
+                            title="Copy Tracking ID">
+                        <i class="fa-regular fa-copy"></i>
+                    </button>
+                </div>
+                @endif
+
                 <div class="flex items-center space-x-6 text-sm">
                     <div>
                         <span class="text-gray-500">Views:</span>
@@ -151,7 +167,7 @@
                     @endif
                 </div>
 
-                <!-- Files Card -->
+                <!-- Files Card with Version and Uploader Info -->
                 @if($journal->files->count() > 0)
                     <div class="bg-white rounded-xl shadow-soft border border-gray-200 p-6">
                         <h2 class="text-lg font-semibold text-gray-800 mb-4">Files</h2>
@@ -171,7 +187,15 @@
                                         <i class="fa-regular fa-file-pdf text-red-600 text-xl"></i>
                                         <div>
                                             <p class="text-sm font-medium text-gray-800">{{ $manuscript->original_name }}</p>
-                                            <p class="text-xs text-gray-500">{{ round($manuscript->file_size / 1024, 2) }} KB</p>
+                                            <div class="flex items-center space-x-2 text-xs text-gray-500">
+                                                <span>{{ round($manuscript->file_size / 1024, 2) }} KB</span>
+                                                <span>•</span>
+                                                <span>Version {{ $manuscript->version ?? 1 }}</span>
+                                                @if($manuscript->uploader)
+                                                    <span>•</span>
+                                                    <span>Uploaded by {{ $manuscript->uploader->name }}</span>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
                                     <i class="fa-solid fa-download text-gray-400"></i>
@@ -191,6 +215,13 @@
                                         <i class="fa-regular fa-eye mr-2"></i> View Full Size
                                     </a>
                                 </div>
+                                <div class="flex items-center space-x-2 text-xs text-gray-500 mt-2">
+                                    <span>Version {{ $coverImage->version ?? 1 }}</span>
+                                    @if($coverImage->uploader)
+                                        <span>•</span>
+                                        <span>Uploaded by {{ $coverImage->uploader->name }}</span>
+                                    @endif
+                                </div>
                             </div>
                         @endif
 
@@ -205,7 +236,15 @@
                                                 <i class="fa-regular fa-file text-gray-500"></i>
                                                 <div>
                                                     <p class="text-sm text-gray-700">{{ $file->original_name }}</p>
-                                                    <p class="text-xs text-gray-500">{{ round($file->file_size / 1024, 2) }} KB</p>
+                                                    <div class="flex items-center space-x-2 text-xs text-gray-500">
+                                                        <span>{{ round($file->file_size / 1024, 2) }} KB</span>
+                                                        <span>•</span>
+                                                        <span>Version {{ $file->version ?? 1 }}</span>
+                                                        @if($file->uploader)
+                                                            <span>•</span>
+                                                            <span>Uploaded by {{ $file->uploader->name }}</span>
+                                                        @endif
+                                                    </div>
                                                 </div>
                                             </div>
                                             <i class="fa-solid fa-download text-xs text-gray-400"></i>
@@ -217,10 +256,14 @@
                     </div>
                 @endif
 
-                <!-- Dates Card -->
+                <!-- Dates Card with Creation Info -->
                 <div class="bg-white rounded-xl shadow-soft border border-gray-200 p-6">
                     <h2 class="text-lg font-semibold text-gray-800 mb-3">Timeline</h2>
                     <div class="space-y-3 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Tracking ID:</span>
+                            <span class="text-gray-800 font-mono font-medium">{{ $journal->tracking_id ?? 'Not assigned' }}</span>
+                        </div>
                         <div class="flex justify-between">
                             <span class="text-gray-500">Created:</span>
                             <span class="text-gray-800 font-medium">{{ $journal->created_at->format('M d, Y H:i') }}</span>
@@ -247,3 +290,41 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+    function copyTrackingId(trackingId) {
+        navigator.clipboard.writeText(trackingId).then(() => {
+            // Show a temporary tooltip or toast
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in-up';
+            toast.textContent = 'Tracking ID copied to clipboard!';
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
+            alert('Failed to copy tracking ID');
+        });
+    }
+</script>
+
+<style>
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .animate-fade-in-up {
+        animation: fadeInUp 0.3s ease-out;
+    }
+</style>
+@endpush

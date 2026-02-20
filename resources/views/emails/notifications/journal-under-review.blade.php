@@ -21,6 +21,20 @@
             Journal Under Review
           </td>
         </tr>
+
+        <!-- Field: Tracking ID -->
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 28px;">
+          <tr>
+            <td
+              style="font-size: 13px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.04em; padding-bottom: 8px;">
+              Tracking ID</td>
+          </tr>
+          <tr>
+            <td style="font-size: 17px; color: #111827; font-weight: 500; line-height: 1.5; font-family: monospace;">
+              {{ $journal->tracking_id ?? 'Not assigned' }}
+            </td>
+          </tr>
+        </table>
         
         <!-- Content -->
         <tr>

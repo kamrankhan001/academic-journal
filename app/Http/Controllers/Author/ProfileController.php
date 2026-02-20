@@ -21,24 +21,24 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
         $profile = $user->profile;
-        $countries = Country::select('id','name')->orderBy('name')->get();
-        
+        $countries = Country::select('id', 'name')->orderBy('name')->get();
+
         // Get member since date
         $memberSince = $user->created_at->format('F Y');
-        
-        if($user->role === 'admin') {
+
+        if ($user->role === 'admin') {
             return view('admin.profile', compact(
-                'user', 
-                'profile', 
-                'memberSince', 
+                'user',
+                'profile',
+                'memberSince',
                 'countries'
             ));
         }
 
         return view('dashboard.profile', compact(
-            'user', 
-            'profile', 
-            'memberSince', 
+            'user',
+            'profile',
+            'memberSince',
             'countries'
         ));
     }
@@ -49,15 +49,23 @@ class ProfileController extends Controller
     public function update(Request $request)
     {
         $user = Auth::user();
-        
-        // Validate request
-        $validator = Validator::make($request->all(), [
+
+        // Base validation rules
+        $rules = [
             'name' => 'required|string|max:255',
             'institution' => 'nullable|string|max:255',
-            'country' => 'nullable|exists:countries,id', // Fixed validation
+            'country' => 'nullable|exists:countries,id',
             'bio' => 'nullable|string',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
-        ]);
+        ];
+
+        // Add email validation only for admin users
+        if ($user->role == 'admin') { // Assuming you have an isAdmin() method or check role
+            $rules['email'] = 'required|email|max:255|unique:users,email,' . $user->id;
+        }
+
+        // Validate request
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
@@ -65,6 +73,12 @@ class ProfileController extends Controller
 
         // Update user name
         $user->name = $request->name;
+
+        // Update email only for admin users
+        if ($user->isAdmin() && $request->has('email')) {
+            $user->email = $request->email;
+        }
+
         $user->save();
 
         // Update or create profile
@@ -83,7 +97,7 @@ class ProfileController extends Controller
 
         // Update other profile fields
         $profile->institution = $request->institution;
-        $profile->country_id = $request->country; // This was correct
+        $profile->country_id = $request->country;
         $profile->bio = $request->bio;
         $profile->save();
 

@@ -97,8 +97,7 @@
                                 <i class="fa-regular fa-envelope text-gray-400"></i>
                             </div>
                             <input type="email" id="email" value="{{ $user->email }}"
-                                class="w-full pl-10 px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed"
-                                readonly>
+                                class="w-full pl-10 px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-600">
                         </div>
                         <p class="text-xs text-gray-500 mt-1">To change your email, please contact support</p>
                     </div>

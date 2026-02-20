@@ -129,12 +129,12 @@
                                     </p>
                                 @endif
                                 
-                                @if(isset($data['action_url']))
+                                <!-- @if(isset($data['action_url']))
                                     <a href="{{ $data['action_url'] }}" class="text-xs text-[#86662c] hover:text-[#6b4f23]">
                                         <i class="fa-regular fa-eye mr-1"></i>
                                         View Details
                                     </a>
-                                @endif
+                                @endif -->
                             </div>
                         </div>
                     </div>

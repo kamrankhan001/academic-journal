@@ -16,7 +16,16 @@ class Journal extends Model
         'status',
         'views_count',
         'submitted_at',
-        'published_at'
+        'published_at',
+        'volume_id',
+        'issue_id',
+        'review_type',
+        'decision',
+        'decision_communicated_at',
+        'page_start',
+        'page_end',
+        'doi',
+        'tracking_id'
     ];
 
     protected $casts = [
@@ -33,7 +42,36 @@ class Journal extends Model
             if (!$journal->slug) {
                 $journal->slug = Str::slug($journal->title) . '-' . uniqid();
             }
+
+            // Generate tracking ID if not set
+            if (!$journal->tracking_id) {
+                $journal->tracking_id = self::generateTrackingId();
+            }
         });
+    }
+
+    /**
+     * Generate a unique tracking ID for the journal
+     * Format: JMSA-YYYY-XXXXX (JMSA = Journal of Medical and Surgical Allied)
+     */
+    public static function generateTrackingId()
+    {
+        $prefix = 'JMSA';
+        $year = date('Y');
+        $lastJournal = self::whereYear('created_at', $year)
+            ->orderBy('id', 'desc')
+            ->first();
+        
+        if ($lastJournal && preg_match('/JMSA-' . $year . '-(\d+)/', $lastJournal->tracking_id, $matches)) {
+            $nextNumber = intval($matches[1]) + 1;
+        } else {
+            $nextNumber = 1;
+        }
+        
+        // Format with leading zeros (5 digits)
+        $formattedNumber = str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+        
+        return "{$prefix}-{$year}-{$formattedNumber}";
     }
 
     // Relationships

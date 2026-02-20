@@ -121,7 +121,7 @@
                     </div>
 
                     <!-- Demo Credentials -->
-                    <div class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <!-- <div class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
                         <p class="text-xs font-medium text-gray-500 mb-2">Demo Credentials:</p>
                         <div class="flex items-center space-x-4 text-xs">
                             <div class="flex items-center">
@@ -133,7 +133,7 @@
                                 <span class="text-gray-600">password</span>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </form>
 
                 <!-- Back to Home -->

@@ -51,6 +51,7 @@ class JournalSubmittedNotification extends Notification implements ShouldQueue
             'journal_id' => $this->journal->id,
             'journal_title' => $this->journal->title,
             'journal_slug' => $this->journal->slug,
+            'tracking_id' => $this->journal->tracking_id,
             'author_name' => $this->journal->author->name,
             'message' => 'New journal submission: "' . $this->journal->title . '"',
             'icon' => 'fa-regular fa-file-lines',

@@ -54,6 +54,7 @@ class JournalApprovedNotification extends Notification implements ShouldQueue
             'journal_id' => $this->journal->id,
             'journal_title' => $this->journal->title,
             'journal_slug' => $this->journal->slug,
+            'tracking_id' => $this->journal->tracking_id,
             'message' => 'Your journal "' . $this->journal->title . '" has been approved.',
             'icon' => 'fa-regular fa-circle-check',
             'icon_bg' => 'bg-green-100',

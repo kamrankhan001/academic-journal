@@ -21,20 +21,20 @@ class JournalController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        
+
         $query = Journal::where('user_id', $user->id)
             ->with(['coAuthors', 'tags']);
-        
+
         // Search filter
         if ($request->filled('search')) {
             $query->where('title', 'like', '%' . $request->search . '%');
         }
-        
+
         // Status filter
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
-        
+
         // Sort
         switch ($request->get('sort', 'newest')) {
             case 'oldest':
@@ -47,9 +47,9 @@ class JournalController extends Controller
                 $query->orderBy('created_at', 'desc');
                 break;
         }
-        
+
         $journals = $query->paginate(10)->withQueryString();
-        
+
         return view('dashboard.journals.index', compact('journals'));
     }
 
@@ -62,6 +62,9 @@ class JournalController extends Controller
         return view('dashboard.journals.create', compact('tags'));
     }
 
+    /**
+     * Store a newly created journal in storage.
+     */
     /**
      * Store a newly created journal in storage.
      */
@@ -121,39 +124,43 @@ class JournalController extends Controller
             }
         }
 
-        // Handle manuscript
+        // Handle manuscript with version and uploaded_by
         if ($request->hasFile('manuscript')) {
             $file = $request->file('manuscript');
             $path = $file->store('journals/' . $journal->id . '/manuscript', 'public');
-            
+
             $journal->files()->create([
                 'file_type' => 'manuscript',
                 'original_name' => $file->getClientOriginalName(),
                 'file_path' => $path,
                 'mime_type' => $file->getMimeType(),
                 'file_size' => $file->getSize(),
+                'version' => 1, // First version
+                'uploaded_by' => Auth::id(), // Current user ID
             ]);
         }
 
-        // Handle cover image
+        // Handle cover image with version and uploaded_by
         if ($request->hasFile('cover_image')) {
             $file = $request->file('cover_image');
             $path = $file->store('journals/' . $journal->id . '/cover', 'public');
-            
+
             $journal->files()->create([
                 'file_type' => 'cover_image',
                 'original_name' => $file->getClientOriginalName(),
                 'file_path' => $path,
                 'mime_type' => $file->getMimeType(),
                 'file_size' => $file->getSize(),
+                'version' => 1, // First version
+                'uploaded_by' => Auth::id(), // Current user ID
             ]);
         }
 
-        // Handle supplementary files
+        // Handle supplementary files with version and uploaded_by
         if ($request->hasFile('supplementary_files')) {
             foreach ($request->file('supplementary_files') as $index => $file) {
                 $path = $file->store('journals/' . $journal->id . '/supplementary', 'public');
-                
+
                 $journal->files()->create([
                     'file_type' => 'supplementary',
                     'original_name' => $file->getClientOriginalName(),
@@ -161,6 +168,8 @@ class JournalController extends Controller
                     'mime_type' => $file->getMimeType(),
                     'file_size' => $file->getSize(),
                     'order' => $index + 1,
+                    'version' => 1, // First version
+                    'uploaded_by' => Auth::id(), // Current user ID
                 ]);
             }
         }
@@ -181,7 +190,7 @@ class JournalController extends Controller
         }
 
         $journal->load(['coAuthors', 'tags', 'files']);
-        
+
         return view('dashboard.journals.show', compact('journal'));
     }
 
@@ -198,10 +207,13 @@ class JournalController extends Controller
         $journal->load(['coAuthors', 'tags', 'files']);
         $tags = Tag::orderBy('name')->get();
         $selectedTags = $journal->tags->pluck('id')->toArray();
-        
+
         return view('dashboard.journals.edit', compact('journal', 'tags', 'selectedTags'));
     }
 
+    /**
+     * Update the specified journal.
+     */
     /**
      * Update the specified journal.
      */
@@ -260,60 +272,80 @@ class JournalController extends Controller
             }
         }
 
-        // Handle new manuscript upload
+        // Handle new manuscript upload (version increment)
         if ($request->hasFile('manuscript')) {
-            // Delete old manuscript
+            // Get next version number
+            $nextVersion = \App\Models\JournalFile::getNextVersion($journal->id, 'manuscript');
+
+            // Store old manuscript for history (optional - you can keep it or delete it)
             $oldManuscript = $journal->manuscript;
             if ($oldManuscript) {
-                Storage::disk('public')->delete($oldManuscript->file_path);
-                $oldManuscript->delete();
+                // Option 1: Keep old versions (recommended for audit trail)
+                // Just don't delete it
+
+                // Option 2: Delete old version if you only want to keep the latest
+                // Storage::disk('public')->delete($oldManuscript->file_path);
+                // $oldManuscript->delete();
             }
 
             $file = $request->file('manuscript');
             $path = $file->store('journals/' . $journal->id . '/manuscript', 'public');
-            
+
             $journal->files()->create([
                 'file_type' => 'manuscript',
                 'original_name' => $file->getClientOriginalName(),
                 'file_path' => $path,
                 'mime_type' => $file->getMimeType(),
                 'file_size' => $file->getSize(),
+                'version' => $nextVersion, // Increment version
+                'uploaded_by' => Auth::id(), // Current user ID
             ]);
         }
 
-        // Handle new cover image
+        // Handle new cover image upload (version increment)
         if ($request->hasFile('cover_image')) {
-            // Delete old cover image
+            // Get next version number
+            $nextVersion = \App\Models\JournalFile::getNextVersion($journal->id, 'cover_image');
+
+            // Store old cover for history (optional)
             $oldCover = $journal->coverImage;
             if ($oldCover) {
-                Storage::disk('public')->delete($oldCover->file_path);
-                $oldCover->delete();
+                // Option 1: Keep old versions
+                // Option 2: Delete old version
+                // Storage::disk('public')->delete($oldCover->file_path);
+                // $oldCover->delete();
             }
 
             $file = $request->file('cover_image');
             $path = $file->store('journals/' . $journal->id . '/cover', 'public');
-            
+
             $journal->files()->create([
                 'file_type' => 'cover_image',
                 'original_name' => $file->getClientOriginalName(),
                 'file_path' => $path,
                 'mime_type' => $file->getMimeType(),
                 'file_size' => $file->getSize(),
+                'version' => $nextVersion, // Increment version
+                'uploaded_by' => Auth::id(), // Current user ID
             ]);
         }
 
-        // Handle new supplementary files
+        // Handle new supplementary files (new files, not versions of existing)
         if ($request->hasFile('supplementary_files')) {
+            $currentCount = $journal->supplementaryFiles()->count();
+
             foreach ($request->file('supplementary_files') as $index => $file) {
                 $path = $file->store('journals/' . $journal->id . '/supplementary', 'public');
-                
+
                 $journal->files()->create([
                     'file_type' => 'supplementary',
                     'original_name' => $file->getClientOriginalName(),
                     'file_path' => $path,
                     'mime_type' => $file->getMimeType(),
                     'file_size' => $file->getSize(),
-                    'order' => $journal->supplementaryFiles()->count() + $index + 1,
+                    'order' => $currentCount + $index + 1,
+                    'version' => 1, // First version for new supplementary files
+                    'uploaded_by' => Auth::id(), // Current user ID
                 ]);
             }
         }
@@ -337,10 +369,10 @@ class JournalController extends Controller
         foreach ($journal->files as $file) {
             Storage::disk('public')->delete($file->file_path);
         }
-        
+
         // Delete the journal directory
         Storage::disk('public')->deleteDirectory('journals/' . $journal->id);
-        
+
         // Delete the journal (cascades to co_authors, files, etc.)
         $journal->delete();
 
